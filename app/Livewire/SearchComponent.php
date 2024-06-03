@@ -1,0 +1,21 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Product;
+use Livewire\Component;
+
+class SearchComponent extends Component
+{
+    public $search;
+
+    public function render()
+    {
+        if($this->search) {
+            $products = Product::where('name','like', '%'.$this->search.'%')->take(5)->get();
+        } else {
+            $products = collect();
+        }
+        return view('livewire.search-component', compact('products'));
+    }
+}
