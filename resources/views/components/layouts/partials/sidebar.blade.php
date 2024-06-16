@@ -56,7 +56,7 @@
                 </li>
                 <li class="nav-item">
                     <a href="{{ route('product.index') }}" class="nav-link {{Request::is('productos') ? 'active' : ''}}">
-                        <i class="nav-icon fas fa-hamburger"></i>
+                        <i class="nav-icon fas fa-box-open"></i>
                         <p>Productos</p>
                     </a>
                 </li>
@@ -67,6 +67,15 @@
                         <p>Usuarios</p>
                     </a>
                 </li>
+
+                <li class="nav-item">
+                    <a href="{{ route('tables.index') }}" class="nav-link {{Request::is('mesas') ? 'active' : ''}}">
+                        <i class="nav-icon fas fa-concierge-bell"></i>
+                        <p>Mesas</p>
+                    </a>
+                </li>
+
+
             </ul>
         </nav>
     </div>

@@ -11,12 +11,13 @@
     @livewireStyles
 </head>
 
-<body class="hold-transition sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-collapse sidebar-mini layout-fixed">
     <div class="wrapper">
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="{{asset('dist/img/AdminLTELogo.png')}}" alt="AdminLTELogo" height="60" width="60">
+            <img class="animation__shake" src="{{ asset('dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo" height="60"
+                width="60">
         </div>
 
         @include('components.layouts.partials.navbar')
@@ -64,10 +65,9 @@
                 $('#' + idModal).modal('show');
             })
 
+            // Emitir evento eliminar al componente
             Livewire.on('delete', (e) => {
-
                 // alert(e.id+'-'+e.eventName)
-
                 Swal.fire({
                     title: "Estas seguro?",
                     text: "No podras revertir esto!",
@@ -79,7 +79,28 @@
                     cancelButtonText: "Cancelar",
                 }).then((result) => {
                     if (result.isConfirmed) {
-                        Livewire.dispatch(e.eventName, {id: e.id})
+                        Livewire.dispatch(e.eventName, {
+                            id: e.id
+                        })
+                    }
+                });
+            })
+
+            // Emitir evento crear al componente mesas
+            Livewire.on('create', (e) => {
+                // alert(e.eventName)
+                Swal.fire({
+                    title: "Crear nueva mesa?",
+                    text: "Quieres agregar una nueva mesa?",
+                    icon: "info",
+                    showCancelButton: true,
+                    confirmButtonColor: "#3085d6",
+                    cancelButtonColor: "#d33",
+                    confirmButtonText: "Si, Crear!",
+                    cancelButtonText: "Cancelar",
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        Livewire.dispatch(e.eventName)
                     }
                 });
             })

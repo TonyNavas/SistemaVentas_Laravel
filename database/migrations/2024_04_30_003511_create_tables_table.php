@@ -14,16 +14,8 @@ return new class extends Migration
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
 
-            $table->unsignedBigInteger('product_id');
-            $table->foreign('product_id')
-            ->references('id')
-            ->on('products')
-            ->cascadeOnUpdate();
-
-            $table->integer('cant');
-            $table->decimal('subtotal');
-            $table->string('notas');
-            $table->enum('status',[0,1])->default(0);
+            $table->string('code')->unique();
+            $table->enum('status',['open','closed'])->default('closed');
 
             $table->timestamps();
         });

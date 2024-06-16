@@ -5,6 +5,8 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Category\CategoryComponent;
 use App\Livewire\Category\CategoryShowComponent;
+use App\Livewire\Mesas\MesasComponent;
+use App\Livewire\Mesas\MesasShowComponent;
 use App\Livewire\Product\ProductComponent;
 use App\Livewire\Product\ProductShowComponent;
 use App\Livewire\User\UserComponent;
@@ -34,4 +36,7 @@ Route::group(['middleware' => ['auth']], function () {
     // Usuarios
     Route::get('usuarios', UserComponent::class)->name('user.index');
     Route::get('usuarios/{user}', UserShowComponent::class)->name('user.show');
+
+    Route::get('mesas', MesasComponent::class)->name('tables.index');
+    Route::get('mesa/{table}', MesasShowComponent::class)->name('mesas.show');
 });

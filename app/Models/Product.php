@@ -3,6 +3,7 @@
 namespace App\Models;
 
 
+use App\Models\Table;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Casts\Attribute;
@@ -25,6 +26,12 @@ class Product extends Model
         return $this->belongsTo(Category::class, 'category_id');
     }
 
+    // Relacion muchos a muchos
+    public function tables()
+    {
+        return $this->belongsToMany(Table::class, 'table_products')->withPivot('quantity');
+    }
+
     // Atributos
     protected function stockLabel(): Attribute
     {
@@ -41,7 +48,7 @@ class Product extends Model
     {
         return Attribute::make(
             get: function () {
-                return '<b>C$'.number_format($this->attributes['precio_venta'],2,',','.').'</b>';
+                return '<b>C$'.number_format($this->attributes['precio_venta'],2,'.',',').'</b>';
             }
         );
     }
