@@ -5,12 +5,12 @@ namespace App\Livewire\Mesas;
 use App\Models\Table;
 use App\Models\Product;
 use Livewire\Component;
-use App\Models\TableProduct;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use App\Models\NumerosEnLetras;
 use Livewire\Attributes\Computed;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use Livewire\Attributes\On;
 
 #[Title('Detalle')]
 class MesasShowComponent extends Component
@@ -24,32 +24,24 @@ class MesasShowComponent extends Component
     public $pagination = 5;
     public $tablesProductsCount = 0;
 
+    public $pago = 0;
+    public $cambio = 0;
+    public $updating = 0;
+
     public function mount()
     {
-        $this->tablesProductsCount();
         $this->recuperarCarrito();
     }
 
-    public function tablesProductsCount()
+    public function getTotalArticles()
     {
-        $this->tablesProductsCount = TableProduct::count();
+        return Cart::instance($this->table->code)->count();
     }
 
-    public function mantenerCarrito()
-    {
-        // Eliminar productos anteriores asociados a la mesa
-        $this->table->products()->detach();
-
-        // Agregar los productos actuales del carrito asociados a la mesa
-        $cartContent = Cart::instance($this->table->code)->content();
-
-        foreach ($cartContent as $item) {
-            $this->table->products()->attach($item->id, ['quantity' => $item->qty]);
-        }
-    }
-
+    #[On('add-product')]
     public function addProduct(Product $product)
     {
+        $this->updating = 0;
         // Verificar si el producto ya está en el carrito
         $existingItem = Cart::instance($this->table->code)->search(function ($cartItem, $rowId) use ($product) {
             return $cartItem->id == $product->id;
@@ -75,6 +67,19 @@ class MesasShowComponent extends Component
         $this->mantenerCarrito();
     }
 
+    public function mantenerCarrito()
+    {
+        // Eliminar productos anteriores asociados a la mesa
+        $this->table->products()->detach();
+
+        // Agregar los productos actuales del carrito asociados a la mesa
+        $cartContent = Cart::instance($this->table->code)->content();
+
+        foreach ($cartContent as $item) {
+            $this->table->products()->attach($item->id, ['quantity' => $item->qty]);
+        }
+    }
+
     public function recuperarCarrito()
     {
         // Limpiar el carrito antes de recuperar los productos de la mesa
@@ -97,20 +102,84 @@ class MesasShowComponent extends Component
         }
     }
 
+    public function increment($id)
+    {
+        $this->updating = 0;
+        // Obtener el producto del carrito
+        $item = Cart::instance($this->table->code)->search(function ($item, $rowId) use ($id) {
+            return $item->id === $id;
+        })->first();
+
+        // Verificar que el item existe
+        if ($item) {
+            // Incrementar la cantidad en el carrito
+            Cart::instance($this->table->code)->update($item->rowId, $item->qty + 1);
+
+            // Incrementar la cantidad en la base de datos
+            $this->table->products()->updateExistingPivot($item->id, ['quantity' => $item->qty + 1]);
+        }
+
+        $this->dispatch("decrementStock.{$id}");
+    }
+
+    public function decrement($id)
+    {
+        $this->updating = 0;
+        // Obtener el producto del carrito
+        $item = Cart::instance($this->table->code)->search(function ($item, $rowId) use ($id) {
+            return $item->id === $id;
+        })->first();
+
+        // Verificar que el item existe y su cantidad es mayor que 1
+        if ($item && $item->qty > 1) {
+            // Decrementar la cantidad en el carrito
+            Cart::instance($this->table->code)->update($item->rowId, $item->qty - 1);
+
+            // Decrementar la cantidad en la base de datos
+            $this->table->products()->updateExistingPivot($item->id, ['quantity' => $item->qty - 1]);
+        } else {
+            // Si la cantidad es 1 o menos, eliminar el producto del carrito y de la base de datos
+            Cart::instance($this->table->code)->remove($item->rowId);
+            $this->table->products()->detach($item->id);
+        }
+
+        $this->dispatch("incrementStock.{$id}");
+    }
+
+    public function removeItem($id, $qty)
+    {
+        $this->updating = 0;
+        // Obtener el producto del carrito
+        $item = Cart::instance($this->table->code)->search(function ($item, $rowId) use ($id) {
+            return $item->id === $id;
+        })->first();
+
+        if ($item) {
+            Cart::instance($this->table->code)->remove($item->rowId);
+            $this->table->products()->detach($item->id);
+        }
+
+        $this->dispatch("devolverStock.{$id}", $qty);
+    }
+
     public function closeTable(Table $table)
     {
-        // Eliminar los productos asociados a la mesa
+        // Eliminar todos los productos del carrito
+        Cart::instance($table->code)->destroy();
+
+        // Eliminar los productos asociados a la mesa en la base de datos
         $table->products()->detach();
 
-        // Cambiar el estado de la mesa a "close"
+        // Cambiar el estado de la mesa a "closed"
         $table->status = 'closed';
         $table->save();
 
         return redirect()->route('tables.index');
     }
 
-    public function numerosLetras($number){
-        return NumerosEnLetras::convertir($number, 'Cordobas',false,'Centavos');
+    public function numerosLetras($number)
+    {
+        return NumerosEnLetras::convertir($number, 'cordobas', false, 'centavos');
     }
 
     #[Computed()]
@@ -127,12 +196,28 @@ class MesasShowComponent extends Component
         $cart = Cart::instance($this->table->code)->content();
         return $cart;
     }
+
+    public function updatingPago($value)
+    {
+        dump($value);
+        $this->updating = 1;
+        $this->pago =  $value;
+        $this->cambio =  $this->pago - Cart::instance($this->table->code)->total(2,'.','');
+    }
+
     public function render()
     {
         if ($this->search != '') {
             $this->resetPage();
         }
-        $cartTotal = (float) Cart::instance($this->table->code)->total(2, '.', '');
+
+        $cartTotal = Cart::instance($this->table->code)->total(2, '.', '');
+
+        if ($this->updating == 0) {
+            $this->pago =  Cart::instance($this->table->code)->total(2, '.', '');
+            $this->cambio =  $this->pago - Cart::instance($this->table->code)->total(2,'.','');
+        }
+
         return view('livewire.mesas.mesas-show-component', [
             'products' => $this->products,
             'cart' => $this->cart,

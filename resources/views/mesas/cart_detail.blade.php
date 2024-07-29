@@ -3,11 +3,11 @@
         <h3 class="card-title"><i class="fas fa-cart-plus"></i> Detalles venta </h3>
         <div class="card-tools">
             <!-- Conteo de productos -->
-            <i class="fas fa-tshirt" title="Numero productos"></i>
-            <span class="badge badge-pill bg-purple">0 </span>
+            <i class="fas fa-hamburger" title="Numero de productos"></i>
+            <span class="badge badge-pill bg-purple">{{ $cart->count() }} </span>
             <!-- Conteo de articulos -->
-            <i class="fas fa-shopping-basket ml-2" title="Numero items"></i>
-            <span class="badge badge-pill bg-purple">0 </span>
+            <i class="fas fa-shopping-basket ml-2" title="Cantidad de producto"></i>
+            <span class="badge badge-pill bg-purple">{{ Cart::instance($this->table->code)->count() }}</span>
         </div>
     </div>
     <!-- card-body -->
@@ -36,18 +36,25 @@
                             <td><b>C${{ number_format($product->price, 2) }}</b></td>
                             <td>
                                 <!-- Botones para aumentar o disminuir la cantidad del producto en el carrito -->
-                                <button class="btn btn-primary btn-xs">
-                                    -
-                                </button>
-                                <span class="mx-1">{{ $product->qty }}</span>
-                                <button class="btn btn-primary btn-xs">
-                                    +
-                                </button>
+                                <div class="btn-group">
+                                    <button wire:click="decrement({{ $product->id }})" class="btn btn-primary btn-xs mr-1"
+                                        wire:loading.attr='disabled' wire:target='decrement'>
+                                        <i class="fas fa-minus-circle"></i>
+                                    </button>
+                                    <span class="mx-1">{{ $product->qty }}</span>
+
+                                    <button wire:click="increment({{ $product->id }})" class="btn btn-primary btn-xs ml-1"
+                                        wire:loading.attr='disabled' wire:target='increment'
+                                        {{ $product->qty >= $product->options->image->stock ? 'disabled' : '' }}>
+                                        <i class="fas fa-plus-circle"></i>
+                                    </button>
+                                </div>
                             </td>
                             <td><b>C$ {{ number_format($product->qty * $product->price, 2) }}</b></td>
                             <td>
                                 <!-- Boton para eliminar el producto del carrito -->
-                                <button class="btn btn-danger btn-xs" title="Eliminar">
+                                <button class="btn btn-danger btn-xs" title="Eliminar"
+                                    wire:click="removeItem({{ $product->id }}, {{ $product->qty }})">
                                     <i class="fas fa-trash-alt"></i>
                                 </button>
                             </td>
@@ -60,10 +67,12 @@
 
                     <tr>
                         <td colspan="4"></td>
-                        <td><h5>Total:</h5></td>
+                        <td>
+                            <h5>Total:</h5>
+                        </td>
                         <td>
                             <h5>
-                                <span class="badge badge-pill badge-secondary">C${{ number_format($cartTotal, 2) }}</span>
+                                <span class="badge badge-pill badge-secondary">C${{ $cartTotal }}</span>
                             </h5>
                         </td>
                         <td></td>
@@ -71,7 +80,7 @@
                     <tr>
                         <td colspan="7">
                             <strong>Total en letras:</strong>
-                            {{$this->numerosLetras($cartTotal)}}
+                            {{ $this->numerosLetras($cartTotal) }}
                         </td>
                     </tr>
                 </tbody>

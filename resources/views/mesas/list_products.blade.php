@@ -18,21 +18,7 @@
             </x-slot>
 
             @forelse ($products as $index => $product)
-                <tr wire:key='product-{{ $index }}'>
-                    <td>{{$product->id}}</td>
-                    <td>
-                        <x-image :item="$product"/>
-                    </td>
-                    <td>{{$product->name}}</td>
-                    <td>{!! $product->precio !!}</td>
-                    <td>{!!$product->stockLabel !!}</td>
-                    <td>
-                        <button wire:click='addProduct({{$product->id}})' class="btn btn-primary btn-sm" title="Agregar">
-                            <i class="fas fa-plus-circle"></i>
-                        </button>
-                    </td>
-
-                </tr>
+                <livewire:mesas.product-row :product="$product" :wire:key="$product->id">
             @empty
                 <tr>
                     <td colspan="10">Sin Registros</td>
@@ -42,7 +28,7 @@
         </x-table>
     </div>
     <div class="card-footer">
-        {{$products->links()}}
+        {{ $products->links() }}
     </div>
 
 </div>

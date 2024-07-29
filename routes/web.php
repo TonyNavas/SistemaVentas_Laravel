@@ -40,3 +40,5 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('mesas', MesasComponent::class)->name('tables.index');
     Route::get('mesa/{table}', MesasShowComponent::class)->name('mesas.show');
 });
+
+

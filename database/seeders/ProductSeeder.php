@@ -18,7 +18,7 @@ class ProductSeeder extends Seeder
         Storage::deleteDirectory('public/products');
         Storage::makeDirectory('public/products');
 
-        Product::factory(250)->create()->each(function(Product $product){
+        Product::factory(50)->create()->each(function(Product $product){
             $faker = Faker::create();
             $product->image()->create(['url'=>'products/'.$faker->image('public/storage/products',640,480,'Product',false)]);
         });

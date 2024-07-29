@@ -17,29 +17,31 @@ class NumerosEnLetras
         'ciento ', 'doscientos ', 'trescientos ', 'cuatrocientos ', 'quinientos ', 'seiscientos ', 'setecientos ', 'ochocientos ', 'novecientos '
     ];
 
-    public static function convertir($number, $currency = 'Córdobas', $format = false, $decimals = 'centavos')
+    public static function convertir($number, $currency = 'cordobas', $format = false, $decimals = 'centavos')
     {
-        // Convertir el número a float para asegurar que es del tipo correcto
         $number = (float)$number;
 
-        // Si el número es 0, devolver "Cero Córdobas"
         if ($number == 0) {
             return 'Cero ' . $currency;
         }
 
-        // Separar parte entera y decimales
+        // Formatear el número con comas como separadores de miles
         $div_decimales = explode('.', number_format($number, 2, '.', ''));
         $base_number = $div_decimales[0];
         $decimales = isset($div_decimales[1]) ? $div_decimales[1] : '00';
 
-        // Convertir la parte entera a letras
         $converted = self::convertirParteEntera($base_number);
 
-        // Generar la salida final
-        if ($format) {
-            $valor_convertido = number_format($number, 2, ',', '.') . ' (' . ucfirst($converted) . ' con ' . self::convertirParteEntera($decimales) . ' ' . $decimals . ')';
+        if ($decimales == '00') {
+            $decimales = 'cero';
         } else {
-            $valor_convertido = ucfirst($converted) . ' con ' . self::convertirParteEntera($decimales) . ' ' . $decimals;
+            $decimales = self::convertirParteEntera($decimales);
+        }
+
+        if ($format) {
+            $valor_convertido = number_format($number, 2, ',', '.') . ' (' . ucfirst($converted) . ' con ' . $decimales . ' ' . $decimals . ')';
+        } else {
+            $valor_convertido = ucfirst($converted) . $currency . ' con ' . $decimales . ' ' . $decimals;
         }
 
         return $valor_convertido;
@@ -72,7 +74,7 @@ class NumerosEnLetras
 
         if (intval($cientos) > 0) {
             if ($cientos == '001') {
-                $output .= 'un ';
+                $output .= 'uno ';
             } else {
                 $output .= self::convertGroup($cientos);
             }
@@ -108,3 +110,4 @@ class NumerosEnLetras
         return $output;
     }
 }
+

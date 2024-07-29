@@ -17,12 +17,12 @@ class UserSeeder extends Seeder
         Storage::deleteDirectory('public/users');
         Storage::makeDirectory('public/users');
 
-        User::factory(50)->create();
+        User::factory(20)->create();
 
         User::factory()->create([
             'name' => 'Administrador',
             'email' => 'useradmin@gmail.com',
-            'password' => bcrypt('password123'),
+            'password' => bcrypt('password'),
         ]);
     }
 }
