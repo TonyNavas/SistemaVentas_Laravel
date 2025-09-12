@@ -8,7 +8,7 @@ use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 
-#[Title('Mesas')]
+#[Title('Cabañas')]
 class MesasComponent extends Component
 {
     use WithPagination;
@@ -44,7 +44,7 @@ class MesasComponent extends Component
         $table->status = 'open';
         $table->save();
 
-        return redirect()->route('mesas.show',  ['table' => $table]);
+        $this->goToTable($table);
     }
 
     public function closeTable(Table $table)

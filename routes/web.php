@@ -1,14 +1,18 @@
 <?php
 
+use App\Http\Controllers\PdfController;
 use App\Livewire\Home\Inicio;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use App\Livewire\Category\CategoryComponent;
 use App\Livewire\Category\CategoryShowComponent;
+use App\Livewire\Kitchen\KitchenComponent;
 use App\Livewire\Mesas\MesasComponent;
 use App\Livewire\Mesas\MesasShowComponent;
 use App\Livewire\Product\ProductComponent;
 use App\Livewire\Product\ProductShowComponent;
+use App\Livewire\Sale\SaleList;
+use App\Livewire\Sale\SaleShow;
 use App\Livewire\User\UserComponent;
 use App\Livewire\User\UserShowComponent;
 
@@ -26,19 +30,27 @@ Route::group(['middleware' => ['auth']], function () {
     Route::get('/', Inicio::class)->name('inicio');
 
     // Categorias
-    Route::get('categorias', CategoryComponent::class)->name('category.index');
-    Route::get('categorias/{category}', CategoryShowComponent::class)->name('category.show');
+    Route::get('/categorias', CategoryComponent::class)->name('category.index');
+    Route::get('/categorias/{category}', CategoryShowComponent::class)->name('category.show');
+
+    // Ventas
+    Route::get('/ventas', SaleList::class)->name('sales.list');
+    Route::get('/ventas/{sale}', SaleShow::class)->name('sales.show');
 
     // Productos
-    Route::get('productos', ProductComponent::class)->name('product.index');
-    Route::get('productos/{product}', ProductShowComponent::class)->name('product.show');
+    Route::get('/productos', ProductComponent::class)->name('product.index');
+    Route::get('/productos/{product}', ProductShowComponent::class)->name('product.show');
 
     // Usuarios
-    Route::get('usuarios', UserComponent::class)->name('user.index');
-    Route::get('usuarios/{user}', UserShowComponent::class)->name('user.show');
+    Route::get('/usuarios', UserComponent::class)->name('user.index');
+    Route::get('/usuarios/{user}', UserShowComponent::class)->name('user.show');
 
-    Route::get('mesas', MesasComponent::class)->name('tables.index');
-    Route::get('mesa/{table}', MesasShowComponent::class)->name('mesas.show');
+    Route::get('/mesas', MesasComponent::class)->name('tables.index');
+    Route::get('/mesa/{table}', MesasShowComponent::class)->name('mesas.show');
+
+    Route::get('/ventas/invoice/{sale}', [PdfController::class, 'invoice'])->name('sales.invoice');
+
+    Route::get('/cocina', KitchenComponent::class)->name('kitchen.index');
 });
 
 

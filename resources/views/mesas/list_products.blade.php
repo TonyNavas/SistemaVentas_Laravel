@@ -2,11 +2,8 @@
     <div class="card-header">
         <h3 class="card-title"><i class="fas fa-tshirt"></i> Productos</h3>
     </div>
-
     <div class="card-body">
-
         <x-table>
-
             <x-slot:thead>
                 <th scope="col">#</th>
                 <th scope="col"><i class="fas fa-image"></i></th>
@@ -15,7 +12,7 @@
                 <th scope="col">Stock</th>
                 <th scope="col">...</th>
 
-            </x-slot>
+            </x-slot:thead>
 
             @forelse ($products as $index => $product)
                 <livewire:mesas.product-row :product="$product" :wire:key="$product->id">

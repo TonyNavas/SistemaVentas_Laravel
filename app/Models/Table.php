@@ -31,14 +31,14 @@ class Table extends Model
 
         // Si no hay mesas aún, el próximo código será M001
         if (empty($existingCodes)) {
-            return 'MESA:001';
+            return 'C:001';
         }
 
         sort($existingCodes);
 
         // Encuentra el siguiente código disponible en la secuencia
         foreach ($existingCodes as $index => $code) {
-            $nextCode = 'MESA:' . str_pad($index + 1, 3, '0', STR_PAD_LEFT);
+            $nextCode = 'C:' . str_pad($index + 1, 3, '0', STR_PAD_LEFT);
             if ($code !== $nextCode) {
                 return $nextCode;
             }
@@ -47,6 +47,11 @@ class Table extends Model
         // Si no hay huecos en la secuencia, el próximo código será el siguiente después del último
         $lastCode = end($existingCodes);
         $nextNumber = (int) filter_var($lastCode, FILTER_SANITIZE_NUMBER_INT) + 1;
-        return 'MESA:' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
+        return 'C:' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
     }
+
+    public function orders()
+{
+    return $this->hasMany(Order::class);
+}
 }

@@ -36,17 +36,6 @@
 
     @include('layouts.scripts')
 
-    <script>
-        document.addEventListener('livewire:init', () => {
-            Livewire.on('close-modal', (idModal) => {
-                $('#' + idModal).modal('hide');
-            })
-            Livewire.on('open-modal', (idModal) => {
-                $('#' + idModal).modal('show');
-            })
-        })
-    </script>
-
     @livewireScripts
 </body>
 

@@ -5,7 +5,14 @@
             <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-            <a href="#" class="nav-link">Home</a>
+            <a href="/" class="nav-link">
+                <i class="nav-icon fas fa-home"></i> Inicio
+            </a>
+        </li>
+        <li class="nav-item d-none d-sm-inline-block">
+            <a href="{{route('tables.index')}}" class="nav-link">
+                <i class="nav-icon fas fa-cart-plus"></i> Crear venta
+            </a>
         </li>
 
     </ul>
@@ -108,19 +115,18 @@
 
         <li class="nav-item dropdown user-menu">
             <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" aria-expanded="false">
-                <img src="{{ auth()->user()->imagen }}" class="user-image img-circle elevation-2"
-                    alt="User Image">
-                <span class="d-none d-md-inline">{{auth()->user()->name}}</span>
+                <img src="{{ auth()->user()->imagen }}" class="user-image img-circle elevation-2" alt="User Image">
+                <span class="d-none d-md-inline">{{ auth()->user()->name }}</span>
             </a>
             <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-right" style="left: inherit; right: 0px;">
                 <!-- User image -->
                 <li class="user-header bg-lightblue">
-                    <img src="{{auth()->user()->imagen}}" class="img-circle elevation-2" alt="User Image">
+                    <img src="{{ auth()->user()->imagen }}" class="img-circle elevation-2" alt="User Image">
 
                     <p>
-                        {{auth()->user()->name}}
+                        {{ auth()->user()->name }}
                         <small>
-                            {{auth()->user()->admin ? 'Administrador' : 'Vendedor'}}
+                            {{ auth()->user()->admin ? 'Administrador' : 'Vendedor' }}
                         </small>
                     </p>
                 </li>
@@ -128,7 +134,7 @@
 
                 <!-- Menu Footer-->
                 <li class="user-footer">
-                    <a href="{{route('user.show', auth()->user()->id)}}" class="btn btn-default btn-flat">Perfil</a>
+                    <a href="{{ route('user.show', auth()->user()->id) }}" class="btn btn-default btn-flat">Perfil</a>
                     <a class="btn btn-default btn-flat float-right" href="{{ route('logout') }}"
                         onclick="event.preventDefault();
                         document.getElementById('logout-form').submit();">

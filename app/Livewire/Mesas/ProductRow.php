@@ -17,6 +17,7 @@ class ProductRow extends Component
         return [
             "decrementStock.{$this->product->id}" => "decrementStock",
             "incrementStock.{$this->product->id}" => "incrementStock",
+            "refreshProducts" => "mount",
             "devolverStock.{$this->product->id}" => "devolverStock",
         ];
     }
@@ -32,7 +33,7 @@ class ProductRow extends Component
             return '<span class="badge badge-pill badge-primary">'.$this->stock.'</span>';
         }
     }
-
+    //Agregar un producto al carrito
     public function addProduct(Product $product){
 
         if($this->stock==0){
@@ -48,9 +49,9 @@ class ProductRow extends Component
 
     public function incrementStock(){
 
-        if($this->stock== $this->product->stock){
-            return;
-        }
+        //if($this->stock == $this->product->stock-1){
+        //    return;
+        //}
 
         $this->stock++;
     }

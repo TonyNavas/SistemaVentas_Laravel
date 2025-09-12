@@ -5,13 +5,14 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? config(app . name) }}</title>
+    <link rel="icon" href="{{asset('cabin.ico') }}">
 
     @include('components.layouts.partials.styles')
 
     @livewireStyles
 </head>
 
-<body class="hold-transition sidebar-collapse sidebar-mini layout-fixed">
+<body class="hold-transition sidebar-fixed sidebar-mini layout-fixed">
     <div class="wrapper">
 
         <!-- Preloader -->

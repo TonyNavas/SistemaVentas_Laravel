@@ -1,6 +1,6 @@
 <div class="container-fluid">
 
-    <x-card cardTitle="Listado mesas ({{ $this->mesasCount }})">
+    <x-card cardTitle="Listado de cabañas ({{ $this->mesasCount }})">
         <x-slot:cardTools>
             <button type="button" class="btn btn-primary" wire:click="$dispatch('create',{eventName:'createNewTable'})">
                 <span>
@@ -19,11 +19,11 @@
                         </div>
                         <figure class="text-center">
                             @if ($table->status == 'closed')
-                                <img style="width: 40%" class="card-img-top mt-5"
-                                    src="{{ asset('dist/img/cubiertos2.png') }}" alt="Card image cap">
+                                <img style="width: 40%; border-radius: 50%;" class="card-img-top mt-5"
+                                    src="{{ asset('dist/img/cabinOpen1.png') }}" alt="Card image cap">
                             @else
-                                <img style="width: 40%" class="card-img-top mt-5"
-                                    src="{{ asset('dist/img/cubiertos.png') }}" alt="Card image cap">
+                                <img style="width: 40%; border-radius: 50%;" class="card-img-top mt-5"
+                                    src="{{ asset('dist/img/cabinClose1.png') }}" alt="Card image cap">
                             @endif
                         </figure>
                         <div class="card-body text-center">

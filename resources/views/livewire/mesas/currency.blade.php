@@ -1,15 +1,15 @@
 <div>
-    <button wire:click="openModal" class="btn bg-purple btn-xs">
+    <button wire:click="openModal" class="btn bg-purple btn-sm">
         <i class="far fa-keyboard"></i>
     </button>
 
     <!-- Modal moneda -->
-    <x-modal modalId="modalCurrency" modalTitle="Pago" style="color: black !importan">
+    <x-modal modalId="modalCurrency" modalTitle="Pago" modalStyle="bg-purple">
         <div class="d-flex justify-content-center align-items-center flex-wrap">
 
             @foreach ($this->valores as $valor)
             <button wire:click="setPago({{$valor}})" type="button" class="btn btn-success m-1" {{$valor <= $total ? 'disabled' : ''}}>
-                C$:{{number_format($valor,2)}}
+                {{money($valor,2)}}
             </button>
             @endforeach
 

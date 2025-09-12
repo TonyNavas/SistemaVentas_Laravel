@@ -17,6 +17,9 @@
                 {{-- Detalles de la mesa --}}
                 @include('mesas.cart_detail')
 
+                {{-- Mesa card Orders --}}
+                @include('mesas.card_orders')
+
                 {{-- Detalles de la mesa --}}
                 @include('mesas.card-pago')
             </div>

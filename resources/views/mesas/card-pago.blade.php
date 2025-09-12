@@ -4,42 +4,44 @@
 
         <div class="card-tools d-flex justify-content-center align-self-center">
 
-            <span class="mr-2">Total: <b>C${{ $cartTotal }}</b></span>
+            <span class="mr-2">Total: <b>{{ money($ordersTotal) }}</b></span>
 
-            @livewire('mesas.currency', ['cartTotal' => $cartTotal])
+            @livewire('mesas.currency', ['total' => $ordersTotal])
+
+            <button wire:click="createSale" class="btn bg-success btn-sm ml-2">
+                <i class="fas fa-money-bill-alt"></i>
+                Pagar y cerrar mesa
+            </button>
         </div>
     </div>
     <div class="card-body">
         <div class="row">
+
             <div class="col-6">
                 <label for="pago">Pago:</label>
                 <div class="input-group ">
-
                     <div class="input-group-prepend">
                         <span class="input-group-text">
                             C$
                         </span>
                     </div>
-
-                    <input type="number" wire:model.live="pago" class="form-control" id="pago" min="{{$cartTotal}}">
-
+                    <input type="number" wire:model.live="pago" class="form-control" id="pago"
+                        min="{{ $ordersTotal }}">
                 </div>
-                <p>{{$this->numerosLetras($pago)}}</p>
+                <p>{{ NumeroLetras($pago) }}</p>
             </div>
+
             <div class="col-6">
                 <label for="pago">Devuelve:</label>
                 <div class="input-group ">
-
                     <div class="input-group-prepend">
                         <span class="input-group-text">
                             C$
                         </span>
                     </div>
                     <input type="number" wire:model='cambio' class="form-control" min="0" readonly>
-
-
                 </div>
-                <p>{{$this->numerosLetras($cambio)}}</p>
+                <p>{{ NumeroLetras($cambio) }}</p>
             </div>
         </div>
     </div>

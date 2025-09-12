@@ -1,19 +1,26 @@
 <div>
-    <x-card cardTitle="Card title" cardFooter="Card footer">
+    <x-card cardTitle="Bienvenid@s" cardFooter="">
         <x-slot:cardTools>
-            <a href="#" class="btn btn-primary">Crear</a>
+            <a href="{{ route('sales.list') }}" class="btn btn-primary">
+                <i class="fas fa-shopping-cart"></i> Ir a ventas
+            </a>
+
+            <a href="{{ route('tables.index') }}" class="btn bg-purple">
+                <i class="fas fa-cart-plus"></i> Crear venta
+            </a>
         </x-slot:cardTools>
 
-        <x-table>
-            <x-slot:thead>
-                <th>thead</th>
-                <th>thead</th>
-            </x-slot:thead>
+        {{-- Row Cards Ventas Hoy --}}
+        @include('home.row-cards-sales')
 
-            <tr>
-                <td>...</td>
-                <td>...</td>
-            </tr>
-        </x-table>
+        {{-- Card grafica --}}
+
+        @include('home.card-graph')
+        {{ $listTotalVentasMes }}
+
+        {{-- Cajas de reportes --}}
+
+        @include('home.cajas-reports')
+
     </x-card>
 </div>
