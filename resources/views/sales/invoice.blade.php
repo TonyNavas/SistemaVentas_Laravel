@@ -107,13 +107,13 @@
                     <tr>
                         <td>{{ $item->id }}</td>
                         <td>{{ $item->product->name }}</td>
-                        <td>{{ money($item->unitary_price) }}</td>
+                        <td>{{ money($item->price) }}</td>
                         <td class="td-item">
                             <span>
                                 {{ $item->quantity }}
                             </span>
                         </td>
-                        <td>{{money($item->unitary_price*$item->quantity)}}</td>
+                        <td>{{money($item->subtotal)}}</td>
                     </tr>
                 @empty
                     <tr>

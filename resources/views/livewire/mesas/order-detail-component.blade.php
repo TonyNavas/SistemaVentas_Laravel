@@ -4,8 +4,8 @@
     </button>
 
     <!-- Modal moneda -->
-    <x-modal :modalId="'modalOrderDetail-' . $orderId" modalTitle="Detalles de la Orden #{{ $orderId }}" modalStyle="bg-purple"
-        modalSize="modal-lg">
+    <x-modal :modalId="'modalOrderDetail-'.$orderId" modalTitle="Detalles de la Orden #{{ $orderId }}" modalStyle="bg-purple"
+        modalSize="modal-lg modal-dialog-centered">
         <div class="d-flex justify-content-center align-items-center flex-wrap">
             <div class="table-responsive">
                 <table class="table table-sm table-striped">
@@ -13,22 +13,22 @@
                         <tr>
                             <th><i class="far fa-image"></i></th>
                             <th>Estado</th>
-                            <th><i class="fas fa-hamburger"></i></th>
+                            <th>Producto</i></th>
                             <th><i class="fas fa-dollar-sign"></i></th>
                             <th>Qty</th>
-                            <th>Sub total</th>
+                            <th>SubTotal</th>
 
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($details as $detail)
                             <tr>
-                                <td><img src="{{ asset($detail->image) }}" width="100" class="img-fluid rounded">
+                                <td><img src="{{ asset($detail->image) }}" width="50" class="img-fluid rounded">
                                 </td>
                                 <td><span class="badge bg-success">{{ $detail->status }}</span></td>
-                                <td>{{ $detail->product->name }}</td>
-                                <td>{{ money($detail->unitary_price) }}</td>
-                                <td>{{ $detail->quantity }}</td>
+                                <td>{{ $detail->name }}</td>
+                                <td>{{ money($detail->price) }}</td>
+                                <td>x{{ $detail->quantity }}</td>
                                 <td>{{ money($detail->subtotal) }}</td>
                             </tr>
                         @empty

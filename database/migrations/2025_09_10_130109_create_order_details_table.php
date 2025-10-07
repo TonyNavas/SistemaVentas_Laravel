@@ -13,10 +13,13 @@ return new class extends Migration
     {
         Schema::create('order_details', function (Blueprint $table) {
             $table->id();
-            $table->integer('quantity')->unsigned();
-            $table->decimal('unitary_price',10,2)->unsigned();;
-            $table->decimal('subtotal',10,2)->unsigned();
+            $table->string('name');
             $table->string('image')->nullable();
+            $table->decimal('price',10,2)->unsigned();
+            $table->integer('quantity')->unsigned();
+            $table->date('fecha');
+            $table->decimal('subtotal',10,2)->unsigned();
+
             $table->enum('status', ['nuevo', 'en_proceso', 'listo', 'cancelado', 'entregado'])->default('nuevo');
 
             $table->foreignId('order_id')->constrained()->onDelete('cascade');

@@ -7,6 +7,7 @@ use App\Models\Category;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Gate;
 
 #[Title('Categorias')]
 class CategoryComponent extends Component
@@ -34,6 +35,7 @@ class CategoryComponent extends Component
     // Crear categoria
     public function store()
     {
+        Gate::authorize('create-categories');
 
         $this->validate([
             'name' => 'required|min:5|max:255|unique:categories'
@@ -51,6 +53,8 @@ class CategoryComponent extends Component
 
     public function create(){
 
+        Gate::authorize('create-categoriess');
+
         $this->Id = 0;
         $this->reset(['name']);
         $this->resetErrorBag();
@@ -59,6 +63,8 @@ class CategoryComponent extends Component
 
     public function edit(Category $category){
 
+        Gate::authorize('update-categories');
+
         $this->reset(['name']);
         $this->Id = $category->id;
         $this->name = $category->name;
@@ -66,6 +72,8 @@ class CategoryComponent extends Component
     }
 
     public function update(Category $category){
+
+        Gate::authorize('update-categories');
 
         $this->validate([
             'name' => 'required|min:5|max:255|unique:categories,id,'.$this->Id
@@ -81,6 +89,8 @@ class CategoryComponent extends Component
 
     #[On('destroyCategory')]
     public function destroy($id){
+
+        Gate::authorize('delete-categories');
 
         $category = Category::findOrFail($id);
         $category->delete();
@@ -98,6 +108,7 @@ class CategoryComponent extends Component
             ->orderBy('id', 'desc')
             ->paginate($this->pagination);
 
+        Gate::authorize('read-categories');
         return view('livewire.category.category-component', compact('categories'));
     }
 }

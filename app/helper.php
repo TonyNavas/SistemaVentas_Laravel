@@ -6,7 +6,7 @@ use App\Models\NumerosEnLetras;
 
     function money($number)
     {
-        return 'C$' .number_format($number,0,'.',',');
+        return 'C$ '.number_format($number,0,'.',',');
     }
 
     function numeroLetras ($number){

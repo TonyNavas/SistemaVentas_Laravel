@@ -15,7 +15,9 @@
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/js/app.js'])
+
+    @include('components.layouts.partials.styles')
     @livewireStyles
 </head>
 
@@ -34,7 +36,19 @@
         </main>
     </div>
 
-    @include('layouts.scripts')
+    @include('components.layouts.partials.scripts')
+
+        <script>
+        document.addEventListener('livewire:init', () => {
+
+            Livewire.on('close-modal', (idModal) => {
+                $('#' + idModal).modal('hide');
+            })
+            Livewire.on('open-modal', (idModal) => {
+                $('#' + idModal).modal('show');
+            })
+        })
+    </script>
 
     @livewireScripts
 </body>

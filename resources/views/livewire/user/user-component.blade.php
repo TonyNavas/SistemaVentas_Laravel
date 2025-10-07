@@ -20,16 +20,28 @@
 
             @forelse ($users as $index => $user)
                 <tr wire:key='User-{{ $index }}'>
-                    <td class="bg-primary">{{ $user->id }}</td>
+                    <td>{{ $user->id }}</td>
                     <td>
                         <x-image :item="$user" class="rounded-circle" />
                     </td>
                     <td>{{ $user->name }}</td>
                     <td>{{ $user->email }}</td>
-                    <td>{{ $user->admin ? 'Administrador' : 'Vendedor' }}</td>
+                    @forelse ($user->getRoleNames() as $roleName)
+                        <td>
+                            <span class="badge bg-purple">
+                                {{ $roleName }}
+                            </span>
+                        </td>
+                    @empty
+                        <td>
+                            <span class="badge badge-danger">
+                                Sin rol
+                            </span>
+                        </td>
+                    @endforelse
                     <td>{!! $user->activeLabel !!}</td>
                     <td class="btn-group">
-                        <a href="{{route('user.show', $user)}}" class="btn btn-info btn-sm" title="Ver">
+                        <a href="{{ route('user.show', $user) }}" class="btn btn-info btn-sm" title="Ver">
                             <i class="far fa-eye"></i>
                         </a>
                         <a href="#" wire:click='edit({{ $user->id }})' class="btn btn-primary btn-sm"
@@ -97,13 +109,8 @@
                         <div class="alert alert-danger w-100 mt-2">{{ $message }}</div>
                     @enderror
                 </div>
-                {{-- Checkbox Admin --}}
-                <div class="form-group form-check col-md-6">
-                    <div class="icheck-primary">
-                        <input wire:model='admin' type="checkbox" id="admin">
-                        <label class="form-check-label" for="admin">Es administrador?</label>
-                    </div>
-                </div>
+
+
                 {{-- Checkbox Active --}}
                 <div class="form-group form-check col-md-6">
                     <div class="icheck-primary">
@@ -111,6 +118,19 @@
                         <label class="form-check-label" for="active">Esta activo?</label>
                     </div>
                 </div>
+
+
+                {{-- Checkbox Admin --}}
+                <div class="form-group col-md-6">
+                    <label for="role">Rol</label>
+                    <select wire:model="role" class="form-control" id="role">
+                        <option value="">---Seleccionar rol---</option>
+                        @foreach ($roles as $name => $label)
+                            <option value="{{ $name }}">{{ $label }}</option>
+                        @endforeach
+                    </select>
+                </div>
+
 
                 {{-- Input image --}}
                 <div class="form-group col-md-6">
@@ -122,13 +142,14 @@
                     @if ($Id > 0)
                         <div class="float-right">
                             <label class="text-muted bold">Imagen actual</label><br>
-                            <x-image :item="$user = App\Models\User::find($Id)" width="100" height="100" position="img-fluid"/>
+                            <x-image :item="$user = App\Models\User::find($Id)" width="100" height="100" position="img-fluid" />
                         </div>
                     @endif
                     @if ($this->image)
                         <div class="float-left">
                             <label class="text-muted bold">Nueva imagen</label><br>
-                            <img src="{{ $image->temporaryUrl() }}" class="rounded img-fluid" width="100" height="100">
+                            <img src="{{ $image->temporaryUrl() }}" class="rounded img-fluid" width="100"
+                                height="100">
                         </div>
                     @endif
                 </div>

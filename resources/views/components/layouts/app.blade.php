@@ -5,7 +5,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{{ $title ?? config(app . name) }}</title>
-    <link rel="icon" href="{{asset('cabin.ico') }}">
+    <link rel="icon" href="{{ asset('cabin.ico') }}">
+
+    @vite(['resources/js/app.js'])
 
     @include('components.layouts.partials.styles')
 
@@ -17,8 +19,8 @@
 
         <!-- Preloader -->
         <div class="preloader flex-column justify-content-center align-items-center">
-            <img class="animation__shake" src="{{ asset('dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo" height="60"
-                width="60">
+            <img class="animation__shake" src="{{ asset('dist/img/AdminLTELogo.png') }}" alt="AdminLTELogo"
+                height="60" width="60">
         </div>
 
         @include('components.layouts.partials.navbar')
@@ -109,6 +111,17 @@
     </script>
 
     @livewireScripts
+
+{{-- <script>
+    window.onload = function() {
+        Echo.channel('orders')
+            .listen('CreateOrder', (e) => {
+                console.log("Nueva orden recibida en mesa:", e);
+            });
+    }
+</script> --}}
+
+
 </body>
 
 </html>

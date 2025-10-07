@@ -35,3 +35,30 @@
         </x-slot:cardFooter>
     </x-card>
 </div>
+
+@section('js')
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        let mesaToken = @js($table->token);
+
+        Echo.private('orders.' + mesaToken)
+            .listen('CreateOrder', (e) => {
+                console.log("Nueva orden recibida en esta mesa:", e);
+
+            })
+            .listen('ChangeOrderStatus', (e) => {
+                console.log("Estado del pedido actualizado:", e);
+
+                        Swal.fire({
+                        position: "center",
+                        title: "Actualizacion de pedido",
+                        icon: "info",
+                        text: "Orden #" + e.order.id + " " + e.order.status,
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+            });
+    });
+</script>
+@endsection
+

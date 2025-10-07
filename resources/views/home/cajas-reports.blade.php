@@ -6,7 +6,7 @@
             <div class="info-box-content">
                 <span class="info-box-text">Ventas</span>
                 <span class="info-box-number">
-                    0
+                    {{$cantidadVentas}}
 
                 </span>
             </div>
@@ -21,7 +21,9 @@
 
             <div class="info-box-content">
                 <span class="info-box-text">Total ventas</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-number">
+                    {{money($totalVentas)}}
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -38,7 +40,9 @@
 
             <div class="info-box-content">
                 <span class="info-box-text">Articulos Vendidos</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-number">
+                    {{$cantidadArticulos}}
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -51,7 +55,9 @@
 
             <div class="info-box-content">
                 <span class="info-box-text">Productos Vendidos</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-number">
+                    {{$cantidadProductos}}
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -70,8 +76,7 @@
             <div class="info-box-content">
                 <span class="info-box-text">Productos</span>
                 <span class="info-box-number">
-                    0
-
+                    {{$cantidadProducts}}
                 </span>
             </div>
             <!-- /.info-box-content -->
@@ -85,7 +90,9 @@
 
             <div class="info-box-content">
                 <span class="info-box-text">Stock total</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-number">
+                    {{number_format($cantidadStock)}}
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -102,7 +109,9 @@
 
             <div class="info-box-content">
                 <span class="info-box-text">Categorias</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-number">
+                    {{$cantidadCategories}}
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>
@@ -114,8 +123,10 @@
             <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-users"></i></span>
 
             <div class="info-box-content">
-                <span class="info-box-text">Clientes</span>
-                <span class="info-box-number">0</span>
+                <span class="info-box-text">Usuarios</span>
+                <span class="info-box-number">
+                    {{$cantUsuarios}}
+                </span>
             </div>
             <!-- /.info-box-content -->
         </div>

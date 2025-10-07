@@ -4,6 +4,7 @@ namespace App\Livewire\Mesas;
 
 use App\Models\Table;
 use Livewire\Component;
+use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
@@ -13,6 +14,8 @@ class MesasComponent extends Component
 {
     use WithPagination;
 
+    public $qrUrl = null;
+
     // Propiedades clase
     public $mesasCount = 0;
     public $search = '';
@@ -21,7 +24,8 @@ class MesasComponent extends Component
     // Propiedades modelo
     public $Id;
 
-    public function mount(){
+    public function mount()
+    {
         $this->mesasCount();
     }
 
@@ -31,7 +35,8 @@ class MesasComponent extends Component
     }
 
     #[On('createNewTable')]
-    public function createNewTable(){
+    public function createNewTable()
+    {
         Table::create([
             'status' => 'closed',
         ]);
@@ -42,14 +47,18 @@ class MesasComponent extends Component
     public function openTable(Table $table)
     {
         $table->status = 'open';
+        $table->token = Str::uuid();
         $table->save();
 
-        $this->goToTable($table);
+        $this->qrUrl = route('mesa.cliente', $table->token);
+
+        // $this->goToTable($table);
     }
 
     public function closeTable(Table $table)
     {
         $table->status = 'closed';
+        $table->token->delete();
         $table->save();
     }
 

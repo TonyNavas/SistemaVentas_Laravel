@@ -8,6 +8,7 @@ use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Title;
+use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Storage;
 
 #[Title('Usuarios')]
@@ -31,6 +32,8 @@ class UserComponent extends Component
     public $active = true;
     public $image;
     public $imageModel;
+
+    public $role;
 
     public function mount()
     {
@@ -59,16 +62,16 @@ class UserComponent extends Component
             'password' => 'required|min:5',
             're_password' => 'required|same:password',
             'image' => 'image|max:1024|nullable',
+            'role' => 'required',
         ]);
 
-        $user = new User();
-
-        $user->name = $this->name;
-        $user->email = $this->email;
-        $user->password = bcrypt($this->password);
-        $user->admin = $this->admin;
-        $user->active = $this->active;
-        $user->save();
+        $user = User::create([
+            'name' => $this->name,
+            'email' => $this->email,
+            'password' => bcrypt($this->password),
+            'active' => $this->active,
+        ]);
+        $user->assignRole($this->role);
 
         if ($this->image) {
             $customName = 'users/' . uniqid() . '.' . $this->image->extension();
@@ -90,35 +93,43 @@ class UserComponent extends Component
         $this->Id = $user->id;
         $this->name = $user->name;
         $this->email = $user->email;
-        $this->admin = $user->admin ? true : false;
         $this->active = $user->active ? true : false;
         $this->imageModel = $user->image ? $user->image->url : null;
+
+        $this->role = $user->roles->pluck('name')->first();
 
         $this->dispatch('open-modal', 'modalUser');
     }
 
     public function update(User $user)
     {
-
         $this->validate([
             'name' => 'required|min:5|max:255',
-            'email' => 'required|email|max:255|unique:users,id,'.$this->Id,
-            'password' => 'min:5|nullable',
+            'email' => 'required|email|max:255|unique:users,email,' . $this->Id,
+            'password' => 'nullable|min:5',
             're_password' => 'same:password',
             'image' => 'image|max:1024|nullable',
+            'role' => 'required|string', // ⚡ que el rol sea obligatorio
         ]);
 
         $user->name = $this->name;
         $user->email = $this->email;
-        $user->password = bcrypt($this->password);
-        $user->admin = $this->admin;
         $user->active = $this->active;
 
-        if($this->password){
-            $user->password = $this->password;
+        // Asignar rol
+        if ($this->role) {
+            $user->syncRoles([$this->role]);
         }
-        $user->update();
 
+        // Actualizar password si fue editada
+        if ($this->password) {
+            $user->password = bcrypt($this->password);
+        }
+
+        // Guardar cambios
+        $user->save();
+
+        // Manejo de imagen
         if ($this->image) {
             if ($user->image != null) {
                 Storage::delete('public/' . $user->image->url);
@@ -134,21 +145,29 @@ class UserComponent extends Component
         $this->resetUI();
     }
 
+
     #[On('destroyUser')]
     public function destroy($id)
     {
-
         $user = User::findOrFail($id);
+
+        // 🔹 Primero limpiar roles y permisos
+        $user->roles()->detach();
+        $user->permissions()->detach();
+
+        // 🔹 Luego manejar la imagen
         if ($user->image != null) {
-            Storage::delete('public/'.$user->image->url);
+            Storage::delete('public/' . $user->image->url);
             $user->image()->delete();
         }
 
+        // 🔹 Finalmente eliminar usuario
         $user->delete();
 
         $this->usersCount();
         $this->dispatch('msg', 'Usuario eliminado correctamente!');
     }
+
 
     // Limpieza de todos los campos
     public function resetUI()
@@ -163,6 +182,12 @@ class UserComponent extends Component
             ->orderBy('id', 'desc')
             ->paginate($this->pagination);
 
-        return view('livewire.user.user-component', compact('users'));
+        $roles = Role::pluck('name', 'name')->all();
+
+
+        return view('livewire.user.user-component', [
+            'users' => $users,
+            'roles' => $roles
+        ]);
     }
 }

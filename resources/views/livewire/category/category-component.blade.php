@@ -19,7 +19,7 @@
 
             @forelse ($categories as $index => $category)
             <tr wire:key="Category-{{$index}}" class="text-center">
-                <td>{{$index}}</td>
+                <td>{{++$index}}</td>
                 <td>{{$category->name}}</td>
                 <td>
                     <div class="btn-group">

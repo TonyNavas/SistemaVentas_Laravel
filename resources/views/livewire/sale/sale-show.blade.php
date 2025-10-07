@@ -47,18 +47,17 @@
                                     <tr>
                                         <th scope="row">{{ $detail->id }}</th>
                                         <td>
-                                            {{-- <img src="{{ asset($product->image) }}" width="50"
-                                                class="img-fluid rounded"> --}}
-                                                <i class="fas fa-image"></i>
+                                            <img src="{{ asset($detail->image) }}" width="50"
+                                                class="img-fluid rounded">
                                         </td>
                                         <td>{{ $detail->product->name }}</td>
-                                        <td>{{ money($detail->product->price) }}</td>
+                                        <td>{{ money($detail->price) }}</td>
                                         <td>
                                             <span class="badge badge-pill badge-primary">
                                                 {{ $detail->quantity }}
                                             </span>
                                         </td>
-                                        <td>{{ money($detail->quantity * $detail->unitary_price) }}</td>
+                                        <td>{{ money($detail->subtotal) }}</td>
                                     </tr>
 
                                 @empty

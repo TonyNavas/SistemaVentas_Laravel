@@ -16,6 +16,7 @@ return new class extends Migration
 
             $table->string('code')->unique();
             $table->enum('status',['open','closed'])->default('closed');
+            $table->string('token',64)->nullable()->unique();
 
             $table->timestamps();
         });

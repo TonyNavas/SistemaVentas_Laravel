@@ -5,15 +5,18 @@ namespace App\Livewire\Category;
 use App\Models\Category;
 use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\WithPagination;
 
 #[Title('Ver categoria')]
 class CategoryShowComponent extends Component
 {
+    use WithPagination;
 
     public Category $category;
 
     public function render()
     {
-        return view('livewire.category.category-show-component');
+        $products = $this->category->products()->paginate(5);
+        return view('livewire.category.category-show-component', compact('products'));
     }
 }

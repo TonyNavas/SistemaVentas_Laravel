@@ -2,9 +2,11 @@
 
 namespace App\Livewire\Kitchen;
 
+use App\Events\ChangeOrderStatus;
 use App\Models\Order;
 use Livewire\Component;
 use App\Models\OrderDetail;
+use Livewire\Attributes\On;
 use Livewire\Attributes\Title;
 
 #[Title('Cocina')]
@@ -16,9 +18,14 @@ class KitchenComponent extends Component
 
     public function mount()
     {
-        $this->orders = Order::whereIn('status', ['nuevo', 'en_proceso', 'listo'])->get();
+        $this->getOrders();
         $this->totalOrders();
         $this->totalPendingProducts();
+    }
+
+    #[On('echo:orders,CreateOrder')]
+    public function getOrders(){
+        $this->orders = Order::whereIn('status', ['nuevo', 'en_proceso', 'listo'])->get();
     }
 
     public function totalOrders()
@@ -44,23 +51,33 @@ class KitchenComponent extends Component
         }
         $orderDetail->save();
 
-        $this->orders = Order::whereIn('status', ['nuevo', 'en_proceso', 'listo'])->get();
+        $this->getOrders();
     }
 
-            public function chancheOrderStatus($orderId)
-    {
-        $order = Order::find($orderId);
-        if($order->status == "nuevo"){
-            $order->status = 'en_proceso';
-        }elseif ($order->status == "en_proceso"){
-            $order->status = 'listo';
-        }elseif($order->status = 'listo'){
-            $order->status = 'entregado';
-        }
+public function chancheOrderStatus($orderId)
+{
+    $order = Order::findOrFail($orderId);
+
+    $estados = ['nuevo', 'en_proceso', 'listo', 'entregado'];
+    $indice = array_search($order->status, $estados);
+
+    if ($indice !== false && $indice < count($estados) - 1) {
+        $order->status = $estados[$indice + 1];
         $order->save();
 
-        $this->orders = Order::whereIn('status', ['nuevo', 'en_proceso', 'listo'])->get();
+        // Si la orden llega al estado "entregado", actualizamos los productos
+        if ($order->status === 'entregado') {
+            $order->details()->update(['status' => 'entregado']);
+        }
+
+        // Emitimos el evento para notificar a la mesa
+        ChangeOrderStatus::dispatch($order, $order->table->token);
+
+        $this->getOrders();
     }
+}
+
+
 
     public function render()
     {

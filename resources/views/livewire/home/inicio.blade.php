@@ -16,11 +16,14 @@
         {{-- Card grafica --}}
 
         @include('home.card-graph')
-        {{ $listTotalVentasMes }}
 
         {{-- Cajas de reportes --}}
 
         @include('home.cajas-reports')
+
+        {{-- Tablas reportes productos --}}
+
+        @include('home.tables-report')
 
     </x-card>
 </div>

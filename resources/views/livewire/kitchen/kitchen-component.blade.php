@@ -25,8 +25,9 @@
                                 <tbody>
                                     @forelse ($order->details as $detail)
                                         <tr>
-                                            <td><img src="{{ asset($detail->image) }}" width="50" class="img-fluid rounded"></td>
-                                            <td>{{ $detail->product->name }}</td>
+                                            <td><img src="{{ asset($detail->image) }}" width="50"
+                                                    class="img-fluid rounded"></td>
+                                            <td>{{ $detail->name }}</td>
                                             <td>x{{ $detail->quantity }}</td>
                                             <td>
                                                 <a wire:click='chancheProductStatus({{ $detail->id }},)'
@@ -42,7 +43,8 @@
                             </table>
 
                             <div class="card-body mt-auto">
-                                <a wire:click='chancheOrderStatus({{ $order->id }})' class="btn btn-primary btn-block">
+                                <a wire:click='chancheOrderStatus({{ $order->id }})'
+                                    class="btn btn-primary btn-block">
                                     {{ $order->status }}
                                 </a>
                             </div>
@@ -59,3 +61,27 @@
     </x-card>
 
 </div>
+
+@section('js')
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            Echo.channel('orders') // canal público/global
+                .listen('CreateOrder', (e) => {
+                    console.log("Nueva orden para cocina:", e);
+
+                    Swal.fire({
+                        position: "center",
+                        title: "Nuevo pedido recibido",
+                        icon: "info",
+                        text: "Ha llegado un nuevo pedido!",
+                        showConfirmButton: false,
+                        timer: 2000
+                    });
+                })
+
+                .listen('ChangeOrderStatus', (e) => {
+                    console.log("Cambio de estado en cocina:", e);
+                });
+        });
+    </script>
+@endsection

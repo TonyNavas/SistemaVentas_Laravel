@@ -14,10 +14,17 @@
                 <div class="card card-primary card-outline">
                     <div class="card-body box-profile">
                         <div class="text-center">
-                            <x-image :item="$user" width="150" height="150" class="img-thumbnail img-fluid rounded-circle"/>
+                            <x-image :item="$user" width="150" height="150"
+                                class="img-thumbnail img-fluid rounded-circle" />
                         </div>
                         <h2 class="profile-username text-center">{{ $user->name }}</h2>
-                        <p class="text-muted text-center">{{ $user->admin ? 'Administrador' : 'Venderdor' }}</p>
+                        <p class="text-muted text-center">
+                            @forelse ($user->getRoleNames() as $roleName)
+                                {{ $roleName}}
+                            @empty
+                                Sin rol
+                            @endforelse
+                        </p>
                         <ul class="list-group mb-3">
                             <li class="list-group-item">
                                 <b>Email</b> <a class="float-right">{{ $user->email }}</a>
@@ -26,7 +33,7 @@
                                 <b>Estado</b> <a class="float-right">{!! $user->activeLabel !!}</a>
                             </li>
                             <li class="list-group-item">
-                                <b>Creado</b> <a class="float-right">{{$user->created_at->diffForHumans()}}</a>
+                                <b>Creado</b> <a class="float-right">{{ $user->created_at->diffForHumans() }}</a>
                             </li>
                         </ul>
                     </div>
@@ -38,27 +45,38 @@
                     <thead class="bg-primary">
                         <tr>
                             <th>ID</th>
-                            <th>Image</th>
-                            <th>Producto</th>
-                            <th>Precio venta</th>
-                            <th>Stock</th>
+                            <th>Total</th>
+                            <th>Productos</th>
+                            <th>Articulos</th>
+                            <th>...</th>
                         </tr>
                     </thead>
 
                     <tbody>
-                        {{-- @foreach ($category->products as $product)
+                        @foreach ($sales as $sale)
                             <tr>
-                                <td>{{ $product->id }}</td>
+                                <td>FV-{{ $sale->id }}</td>
+                                <td>{{ money($sale->total) }}</td>
                                 <td>
-                                    <x-image :item="$product" />
+                                    <span class="badge badge-pill badge-primary">
+                                        {{ $sale->orderDetails->count() }}
+                                    </span>
                                 </td>
-                                <td>{{ $product->name }}</td>
-                                <td>{!! $product->precio !!}</td>
-                                <td>{!! $product->stockLabel !!}</td>
+                                <td>
+                                    <span class="badge badge-pill badge-primary">
+                                        {{ $sale->orderDetails->sum('quantity') }}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="{{route('sales.show', $sale)}}" class="btn btn-primary btn-sm">
+                                        Ver venta
+                                    </a>
+                                </td>
                             </tr>
-                        @endforeach --}}
+                        @endforeach
                     </tbody>
                 </table>
+                {{ $sales->links() }}
             </div>
         </div>
     </x-card>

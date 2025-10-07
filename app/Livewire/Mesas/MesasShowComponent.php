@@ -3,20 +3,21 @@
 namespace App\Livewire\Mesas;
 
 use App\Models\Item;
+use App\Models\Sale;
+use App\Models\Order;
 use App\Models\Table;
 use App\Models\Product;
 use Livewire\Component;
+use App\Events\CreateOrder;
+use App\Models\OrderDetail;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
 use App\Models\NumerosEnLetras;
-use App\Models\Order;
-use App\Models\OrderDetail;
-use App\Models\Sale;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
-use Gloudemans\Shoppingcart\Facades\Cart;
 use Illuminate\Support\Facades\Auth;
+use Gloudemans\Shoppingcart\Facades\Cart;
 
 #[Title('Detalle de cabaña')]
 class MesasShowComponent extends Component
@@ -24,6 +25,7 @@ class MesasShowComponent extends Component
     use WithPagination;
 
     public Table $table;
+    public $mesaToken;
 
     // Propiedades clase
     public $search = '';
@@ -40,6 +42,7 @@ class MesasShowComponent extends Component
 
     public function mount()
     {
+        $this->mesaToken = $this->table->token;
         $this->recuperarCarrito();
     }
 
@@ -128,7 +131,7 @@ class MesasShowComponent extends Component
             Cart::instance($this->table->code)->update($item->rowId, $item->qty + 1);
 
             // Incrementar la cantidad en la base de datos
-            $this->table->products()->updateExistingPivot($item->id, ['quantity' => $item->qty + 1]);
+            // $this->table->products()->updateExistingPivot($item->id, ['quantity' => $item->qty + 1]);
         }
 
         $this->dispatch("decrementStock.{$id}");
@@ -196,7 +199,7 @@ class MesasShowComponent extends Component
             $order = new Order();
             $order->status = 'nuevo';
             $order->total = Cart::instance($this->table->code)->total(2, '.', '');
-            $order->pago = null; //Quitarlo y luego rellenarlo al hacer la venta
+            // $order->pago = null; //Quitarlo y luego rellenarlo al hacer la venta
             $order->fecha = date('Y-m-d');
             $order->notas = '';
             $order->user_id = Auth::user()->id;
@@ -207,10 +210,12 @@ class MesasShowComponent extends Component
             foreach (Cart::instance($this->table->code)->content() as $product) {
                 $detail = new OrderDetail();
 
-                $detail->quantity = $product->qty;
-                $detail->unitary_price = $product->price;
-                $detail->subtotal = $product->qty * $product->price;
+                $detail->name = $product->name;
                 $detail->image = $product->options->image->imagen;
+                $detail->price = $product->price;
+                $detail->quantity = $product->qty;
+                $detail->fecha = date('Y-m-d');
+                $detail->subtotal = $product->qty * $product->price;
                 $detail->status = 'nuevo';
                 $detail->order_id = $order->id;
                 $detail->product_id = $product->id;
@@ -223,6 +228,8 @@ class MesasShowComponent extends Component
             Cart::instance($this->table->code)->destroy();
             $this->reset(['pago', 'cambio']);
             $this->dispatch('msg', 'Pedido realizado correctamente', 'success');
+
+            CreateOrder::dispatch($order, $this->table->token);
         });
     }
 
@@ -284,6 +291,7 @@ class MesasShowComponent extends Component
 
         // Cambiar el estado de la mesa a "closed"
         $table->status = 'closed';
+        $table->token = null;
         $table->save();
 
         return redirect()->route('tables.index');
@@ -293,9 +301,11 @@ class MesasShowComponent extends Component
     public function products()
     {
         return Product::where('name', 'LIKE', '%' . $this->search . '%')
+            ->where('active', 1) // 👈 solo productos activos
             ->orderBy('id', 'desc')
             ->paginate($this->pagination);
     }
+
 
     public function updatingPago($value)
     {
@@ -335,6 +345,12 @@ class MesasShowComponent extends Component
             ->get()
             ->flatMap->details
             ->sum('subtotal');
+    }
+
+    #[On('echo-private:orders.{mesaToken},ChangeOrderStatus')]
+    public function refreshOrders()
+    {
+        $this->dispatch('$refresh'); // 🔄 fuerza recalcular los #[Computed]
     }
 
 

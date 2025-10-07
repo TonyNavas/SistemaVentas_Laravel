@@ -13,7 +13,6 @@ class SaleShow extends Component
 
     public function render()
     {
-        dump($this->sale);
         return view('livewire.sale.sale-show');
     }
 }

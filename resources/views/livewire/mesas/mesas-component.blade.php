@@ -27,6 +27,23 @@
                             @endif
                         </figure>
                         <div class="card-body text-center">
+
+                            {{-- QR --}}
+                            @if ($table->token)
+                                <div class="text-center">
+                                    <h5 class="mb-3">Escanea este QR</h5>
+                                    {!! QrCode::size(200)->generate(route('mesa.cliente', $table->token)) !!}
+
+                                    <p class="mt-3">
+                                        <a class="nav-link" href="{{ route('mesa.cliente', $table->token) }}">{{ route('mesa.cliente', $table->token) }}</a>
+                                    </p>
+                                </div>
+                            @else
+                                <div class="alert alert-warning">
+                                    Esta mesa está <strong>cerrada</strong> y no tiene QR asignado.
+                                </div>
+                            @endif
+                                {{-- End QR --}}
                             <p class="card-text">
                                 <span class="badge bg-info">
                                     {{ $table->status == 'closed' ? 'DISPONIBLE' : 'OCUPADA' }}
@@ -37,8 +54,7 @@
                                     <a class="btn btn-success w-100" wire:click="openTable({{ $table->id }})">Abrir
                                         Mesa</a>
                                 @else
-                                    <a class="btn btn-info w-100" wire:click="goToTable({{ $table->id }})">Regresar
-                                        al detalle</a>
+                                    <a class="btn btn-info w-100" wire:click="goToTable({{ $table->id }})">Entrar</a>
                                 @endif
 
                                 <a wire:click="$dispatch('delete', {id : {{ $table->id }}, eventName: 'deleteTable'})"

@@ -23,7 +23,7 @@
             </x-slot:thead>
 
             @forelse ($products as $index => $product)
-            <tr wire:key="Category-{{$index}}" class="text-center">
+            <tr wire:key="Product-{{$index}}" class="text-center">
                 <td>{{$index}}</td>
                 <td>
                     <x-image :item="$product"/>
