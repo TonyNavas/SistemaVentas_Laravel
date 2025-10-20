@@ -90,6 +90,8 @@
         <div><strong>Factura:</strong><span>FV-{{ $sale->id }}</span>
         <strong>Fecha:</strong>{{ $sale->fecha }}</div>
         <hr>
+        <strong>Cliente:</strong>{{ $sale->table->client_name }}</div>
+        <hr>
 
         <!-- Productos -->
         <table width="100%" class="productos">
