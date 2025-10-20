@@ -3,8 +3,9 @@
 namespace App\Livewire\Product;
 
 use App\Models\Product;
-use Livewire\Attributes\Title;
 use Livewire\Component;
+use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Gate;
 
 #[Title('Ver producto')]
 class ProductShowComponent extends Component
@@ -13,6 +14,7 @@ class ProductShowComponent extends Component
 
     public function render()
     {
+        Gate::authorize('ver-productos');
         return view('livewire.product.product-show-component');
     }
 }

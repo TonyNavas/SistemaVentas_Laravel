@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Sale;
 
-use App\Models\Product;
 use App\Models\Sale;
-use Livewire\Attributes\On;
+use App\Models\Product;
 use Livewire\Component;
+use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Gate;
 
 #[Title('Listado de ventas')]
 class SaleList extends Component
@@ -36,6 +37,7 @@ class SaleList extends Component
     #[On('destroySale')]
     public function destroy($id)
     {
+        Gate::authorize('eliminar-ventas');
         $sale = Sale::findOrFail($id);
 
         foreach ($sale->items as $item) {
@@ -54,7 +56,6 @@ class SaleList extends Component
     #[On('setDates')]
     public function setDates($fechaInicio, $fechaFinal)
     {
-
         $this->dateInicio = $fechaInicio;
         $this->dateFin = $fechaFinal;
     }
@@ -62,6 +63,7 @@ class SaleList extends Component
 
     public function render()
     {
+        Gate::authorize('ver-ventas');
         if ($this->search != '') {
             $this->resetPage();
         }

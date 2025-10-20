@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Admin;
 
-use Livewire\Attributes\Computed;
 use Livewire\Component;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Livewire\Attributes\Computed;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Permission;
 
 #[Title('Roles')]
@@ -36,6 +37,8 @@ class RoleComponent extends Component
     // Abrir modal
     public function create()
     {
+        Gate::authorize('crear-roles');
+
         $this->Id = 0;
         $this->dispatch('open-modal', 'modalRole');
     }
@@ -43,6 +46,8 @@ class RoleComponent extends Component
     // Guardar rl
     public function store()
     {
+        Gate::authorize('crear-roles');
+
         $this->validate([
             'name' => 'required|min:5|max:255|unique:roles',
             'permissions' => 'nullable|array'
@@ -63,6 +68,8 @@ class RoleComponent extends Component
     // Cargar roles en el modal
     public function edit(Role $role)
     {
+        Gate::authorize('modificar-roles');
+
         $this->Id = $role->id;
         $this->name = $role->name;
 
@@ -74,6 +81,7 @@ class RoleComponent extends Component
     // Actualizar rol
     public function update(Role $role)
     {
+        Gate::authorize('modificar-roles');
 
         $this->validate([
             'name' => 'required|min:5|max:255|unique:roles,id,' . $this->Id,
@@ -96,6 +104,8 @@ class RoleComponent extends Component
     #[On('destroyRol')]
     public function destroy($id)
     {
+        Gate::authorize('eliminar-roles');
+
         $role = Role::findOrFail($id);
         $role->delete();
 
@@ -114,11 +124,10 @@ class RoleComponent extends Component
             ->paginate($this->pagination);
     }
 
-
     public function render()
     {
+        Gate::authorize('ver-roles');
         $Allpermissions = Permission::all();
-
         return view('livewire.admin.role-component', [
             'roles' => $this->roles,
             'Allpermissions' => $Allpermissions

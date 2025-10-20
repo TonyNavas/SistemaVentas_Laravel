@@ -20,9 +20,11 @@
                 </div>
 
 
-                <a href="route({{ 'sales.create' }})" class="btn btn-primary" wire:click='create'>
+                @can('ver-mesa')
+                    <a href="route({{'tables.index'}})" class="btn btn-primary" wire:click='create'>
                     <i class="fas fa-plus-circle"></i> Crear venta
                 </a>
+                @endcan
 
             </div>
         </x-slot:cardTools>
@@ -35,6 +37,7 @@
                 <th>Productos</th>
                 <th>Articulos</th>
                 <th>Fecha</th>
+                <th>Tiempo</th>
                 <th>Acciones</th>
             </x-slot>
 
@@ -64,24 +67,34 @@
 
                     </td>
                     <td>{{ $sale->fecha }}</td>
-
+                    <td>{{$sale->created_at->diffForHumans()}}</td>
                     <td>
                         <div class="btn-group">
-                            <a href="{{route('sales.invoice',$sale)}}" class="btn bg-navy btn-sm" title="Generar factura" target="_blank">
+                            @can('imprimir-ticket')
+                                <a href="{{route('sales.invoice',$sale)}}" class="btn bg-navy btn-sm" title="Generar factura" target="_blank">
                                 <i class="fas fa-print"></i>
                             </a>
-                            <a a href="{{route('sales.show',$sale)}}" class="btn btn-sm btn-success">
+                            @endcan
+
+                            @can('ver-ventas')
+                                <a a href="{{route('sales.show',$sale)}}" class="btn btn-sm btn-success">
                                 <i class="fa fa-eye"></i>
                             </a>
-                            <a href="#" wire:click="edit({{ $sale->id }})" class="btn btn-sm btn-primary"
+                            @endcan
+
+
+                            {{-- <a href="#" wire:click="edit({{ $sale->id }})" class="btn btn-sm btn-primary"
                                 title="Editar" disabled>
                                 <i class="fa fa-edit"></i>
-                            </a>
+                            </a> --}}
+
+                            @can('eliminar-ventas', $sale)
                             <a wire:click="$dispatch('delete', {id : {{ $sale->id }},
                                 eventName:'destroySale'})"
                                 class="btn btn-sm btn-danger">
                                 <i class="fa fa-trash"></i>
                             </a>
+                            @endcan
                         </div>
                     </td>
                 </tr>

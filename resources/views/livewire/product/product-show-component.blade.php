@@ -16,11 +16,6 @@
                         <div class="col-12">
                             <img src="{{$product->imagen}}" class="product-image rounded image-fluid" alt="Product Image">
                         </div>
-                        <div class="col-12 product-image-thumbs">
-                            <div class="product-image-thumb">
-                                {{-- <img src="../../dist/img/prod-1.jpg" alt="Product Image"> --}}
-                            </div>
-                        </div>
 
                     </div>
                     <div class="col-12 col-sm-7">

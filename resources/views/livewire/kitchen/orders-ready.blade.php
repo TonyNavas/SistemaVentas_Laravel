@@ -1,13 +1,13 @@
 <div class="container-fluid">
 
     <x-card
-        cardTitle="Ordenes pendientes ({{ $PendingOrders }}) - Total de productos pendientes ({{ $pendingProducts }})">
+        cardTitle="Listado de pedidos listos para entregar">
         <x-slot:cardTools>
 
         </x-slot:cardTools>
         <div class="row">
             @forelse ($orders as $order)
-                <div class="col-lg-4 col-md-6 col-sm-12 mb-3">
+                <div class="col-md-3 mb-3">
                     <div class="card h-100">
                         <div class="card-body d-flex flex-column"">
                             <h5>Orden#{{ $order->id }} - Mesa{{ $order->table->code }}</h5>
@@ -15,14 +15,13 @@
                         </div>
 
                         <ul class="list-group list-group-flush">
-                            <div class="table-responsive">
+
                             <table class="table">
                                 <tbody>
                                     @forelse ($order->details as $detail)
                                         <tr>
-                                            <td>
-                                                <img class="rounded" src="{{ asset($detail->image) }}" alt="Image" width="50">
-                                            </td>
+                                            <td><img src="{{ asset($detail->image) }}" width="50"
+                                                    class="img-fluid rounded"></td>
                                             <td>{{ $detail->name }}</td>
                                             <td>x{{ $detail->quantity }}</td>
                                             <td>
@@ -40,9 +39,9 @@
                                     @endforelse
                                 </tbody>
                             </table>
-                            </div>
+
                             <div class="card-body mt-auto">
-                                @can('cambiar-estado-orden')
+                                @can('cambiar-estado-orden-lista')
                                     <a wire:click='chancheOrderStatus({{ $order->id }})'
                                         class="btn btn-primary btn-block">
                                         {{ $order->status }}
@@ -57,7 +56,7 @@
             @endforelse
         </div>
         <x-slot:cardFooter>
-            Footer
+
         </x-slot:cardFooter>
     </x-card>
 

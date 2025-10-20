@@ -5,6 +5,7 @@ namespace App\Livewire\Product;
 use App\Models\Product;
 use Livewire\Component;
 use App\Models\Category;
+use Illuminate\Support\Facades\Gate;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\WithFileUploads;
@@ -48,14 +49,9 @@ class ProductComponent extends Component
         $this->productCount = Product::count();
     }
 
-    #[Computed()]
-    public function categories()
-    {
-        return Category::all();
-    }
-
     public function create()
     {
+        Gate::authorize('crear-productos');
         $this->Id = 0;
         $this->resetUI();
         $this->resetErrorBag();
@@ -65,7 +61,7 @@ class ProductComponent extends Component
     // Crear categoria
     public function store()
     {
-
+        Gate::authorize('crear-productos');
         $this->validate([
             'name' => 'required|min:5|max:255|unique:products',
             'desc' => 'max:255',
@@ -105,7 +101,7 @@ class ProductComponent extends Component
 
     public function edit(Product $product)
     {
-
+        Gate::authorize('modificar-productos');
         $this->resetUI();
 
         $this->Id = $product->id;
@@ -126,7 +122,7 @@ class ProductComponent extends Component
 
     public function update(Product $product)
     {
-
+        Gate::authorize('modificar-productos');
         $this->validate([
             'name' => 'required|min:5|max:255|unique:products,id,' . $this->Id,
             'desc' => 'max:255',
@@ -168,7 +164,7 @@ class ProductComponent extends Component
     #[On('destroyProduct')]
     public function destroy($id)
     {
-
+        Gate::authorize('eliminar-productos');
         $product = Product::findOrFail($id);
         if ($product->image != null) {
             Storage::delete('public/' . $product->image->url);
@@ -188,8 +184,15 @@ class ProductComponent extends Component
         $this->resetErrorBag();
     }
 
+    #[Computed()]
+    public function categories()
+    {
+        return Category::all();
+    }
+
     public function render()
     {
+        Gate::authorize('ver-productos');
         $products = Product::where('name', 'LIKE', '%' . $this->search . '%')
             ->orderBy('id', 'desc')
             ->paginate($this->pagination);

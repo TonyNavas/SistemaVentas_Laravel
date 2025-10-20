@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('tables', function (Blueprint $table) {
             $table->id();
-
+            $table->string('client_name')->nullable();
             $table->string('code')->unique();
             $table->enum('status',['open','closed'])->default('closed');
             $table->string('token',64)->nullable()->unique();

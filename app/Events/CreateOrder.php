@@ -2,6 +2,7 @@
 
 namespace App\Events;
 
+use Log;
 use App\Models\Order;
 use Illuminate\Broadcasting\Channel;
 use Illuminate\Queue\SerializesModels;

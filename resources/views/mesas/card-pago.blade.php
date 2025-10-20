@@ -5,13 +5,14 @@
         <div class="card-tools d-flex justify-content-center align-self-center">
 
             <span class="mr-2">Total: <b>{{ money($ordersTotal) }}</b></span>
-
+            @can('registrar-pago')
             @livewire('mesas.currency', ['total' => $ordersTotal])
 
-            <button wire:click="createSale" class="btn bg-success btn-sm ml-2">
-                <i class="fas fa-money-bill-alt"></i>
-                Pagar y cerrar mesa
-            </button>
+                <button wire:click="createSale" class="btn bg-success btn-sm ml-2">
+                    <i class="fas fa-money-bill-alt"></i>
+                    Registrar pago
+                </button>
+            @endcan
         </div>
     </div>
     <div class="card-body">

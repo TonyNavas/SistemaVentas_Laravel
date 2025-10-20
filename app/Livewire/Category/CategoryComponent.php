@@ -16,7 +16,7 @@ class CategoryComponent extends Component
 
     // Propiedades clase
     public $categoryCount = 0, $search = '';
-    public $pagination = 5;
+    public $pagination = 8;
 
     // Propiedades modelo
     public $name;
@@ -35,7 +35,7 @@ class CategoryComponent extends Component
     // Crear categoria
     public function store()
     {
-        Gate::authorize('create-categories');
+        Gate::authorize('crear-categorias');
 
         $this->validate([
             'name' => 'required|min:5|max:255|unique:categories'
@@ -53,7 +53,7 @@ class CategoryComponent extends Component
 
     public function create(){
 
-        Gate::authorize('create-categoriess');
+        Gate::authorize('crear-categorias');
 
         $this->Id = 0;
         $this->reset(['name']);
@@ -63,7 +63,7 @@ class CategoryComponent extends Component
 
     public function edit(Category $category){
 
-        Gate::authorize('update-categories');
+        Gate::authorize('modificar-categorias');
 
         $this->reset(['name']);
         $this->Id = $category->id;
@@ -73,7 +73,7 @@ class CategoryComponent extends Component
 
     public function update(Category $category){
 
-        Gate::authorize('update-categories');
+        Gate::authorize('modificar-categorias');
 
         $this->validate([
             'name' => 'required|min:5|max:255|unique:categories,id,'.$this->Id
@@ -90,7 +90,7 @@ class CategoryComponent extends Component
     #[On('destroyCategory')]
     public function destroy($id){
 
-        Gate::authorize('delete-categories');
+        Gate::authorize('eliminar-categorias');
 
         $category = Category::findOrFail($id);
         $category->delete();
@@ -108,7 +108,7 @@ class CategoryComponent extends Component
             ->orderBy('id', 'desc')
             ->paginate($this->pagination);
 
-        Gate::authorize('read-categories');
+        Gate::authorize('ver-categorias');
         return view('livewire.category.category-component', compact('categories'));
     }
 }

@@ -20,7 +20,7 @@
                         <h2 class="profile-username text-center">{{ $user->name }}</h2>
                         <p class="text-muted text-center">
                             @forelse ($user->getRoleNames() as $roleName)
-                                {{ $roleName}}
+                                {{ $roleName }}
                             @empty
                                 Sin rol
                             @endforelse
@@ -68,9 +68,11 @@
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="{{route('sales.show', $sale)}}" class="btn btn-primary btn-sm">
-                                        Ver venta
-                                    </a>
+                                    @can('ver-ventas')
+                                        <a href="{{ route('sales.show', $sale) }}" class="btn btn-primary btn-sm">
+                                            Ver venta
+                                        </a>
+                                    @endcan
                                 </td>
                             </tr>
                         @endforeach

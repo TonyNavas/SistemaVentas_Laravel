@@ -8,6 +8,7 @@ use Illuminate\Support\Str;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
 use Livewire\Attributes\Title;
+use Illuminate\Support\Facades\Gate;
 
 #[Title('Cabañas')]
 class MesasComponent extends Component
@@ -37,6 +38,7 @@ class MesasComponent extends Component
     #[On('createNewTable')]
     public function createNewTable()
     {
+        Gate::authorize('crear-mesa');
         Table::create([
             'status' => 'closed',
         ]);
@@ -46,6 +48,7 @@ class MesasComponent extends Component
 
     public function openTable(Table $table)
     {
+        Gate::authorize('abrir-mesa');
         $table->status = 'open';
         $table->token = Str::uuid();
         $table->save();
@@ -57,6 +60,7 @@ class MesasComponent extends Component
 
     public function closeTable(Table $table)
     {
+        Gate::authorize('cerrar-mesa');
         $table->status = 'closed';
         $table->token->delete();
         $table->save();
@@ -70,6 +74,7 @@ class MesasComponent extends Component
     #[On('deleteTable')]
     public function destroy($id)
     {
+        Gate::authorize('eliminar-mesa');
         $table = Table::findOrFail($id);
         $table->delete();
         $this->mesasCount();
@@ -77,6 +82,7 @@ class MesasComponent extends Component
 
     public function render()
     {
+        Gate::authorize('ver-mesa');
         if ($this->search != '') {
             $this->resetPage();
         }

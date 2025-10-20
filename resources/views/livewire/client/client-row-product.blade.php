@@ -27,4 +27,5 @@
                 <i class="fas fa-plus-circle"></i>
                 Agregar al carrito
             </button>
+
 </li>

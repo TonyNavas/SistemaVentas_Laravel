@@ -1,9 +1,11 @@
 <div>
     <x-card cardTitle="Listado de usuarios ({{ $this->usersCount }})">
         <x-slot:cardTools>
-            <a href="#" class="btn btn-primary" wire:click='create'>
+            @can('crear-usuarios')
+                <a class="btn btn-primary" wire:click='create'>
                 <i class="fas fa-plus-circle"></i> Crear usuario
             </a>
+            @endcan
         </x-slot>
 
         <x-table>
@@ -41,17 +43,22 @@
                     @endforelse
                     <td>{!! $user->activeLabel !!}</td>
                     <td class="btn-group">
-                        <a href="{{ route('user.show', $user) }}" class="btn btn-info btn-sm" title="Ver">
-                            <i class="far fa-eye"></i>
-                        </a>
-                        <a href="#" wire:click='edit({{ $user->id }})' class="btn btn-primary btn-sm"
-                            title="Editar">
-                            <i class="far fa-edit"></i>
-                        </a>
-                        <a wire:click="$dispatch('delete',{id: {{ $user->id }}, eventName:'destroyUser'})"
-                            class="btn btn-danger btn-sm" title="Eliminar">
-                            <i class="far fa-trash-alt"></i>
-                        </a>
+                        @can('ver-usuarios')
+                            <a href="{{ route('user.show', $user) }}" class="btn btn-info btn-sm" title="Ver">
+                                <i class="far fa-eye"></i>
+                            </a>
+                        @endcan
+                        @can('modificar-usuarios')
+                            <a wire:click='edit({{ $user->id }})' class="btn btn-primary btn-sm" title="Editar">
+                                <i class="far fa-edit"></i>
+                            </a>
+                        @endcan
+                        @can('eliminar-usuarios')
+                            <a wire:click="$dispatch('delete',{id: {{ $user->id }}, eventName:'destroyUser'})"
+                                class="btn btn-danger btn-sm" title="Eliminar">
+                                <i class="far fa-trash-alt"></i>
+                            </a>
+                        @endcan
                     </td>
                 </tr>
 

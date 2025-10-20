@@ -112,15 +112,22 @@
 
     @livewireScripts
 
-{{-- <script>
-    window.onload = function() {
-        Echo.channel('orders')
-            .listen('CreateOrder', (e) => {
-                console.log("Nueva orden recibida en mesa:", e);
+    @auth
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                Echo.private('App.Models.User.' + {{ auth()->user()->id }})
+                    .notification((notification) => {
+                        Swal.fire({
+                            position: "center",
+                            title: "Nueva notificación",
+                            icon: "info",
+                            text: "Nueva notificacion recibida",
+                            showConfirmButton: true,
+                        });
+                    })
             });
-    }
-</script> --}}
-
+        </script>
+    @endauth
 
 </body>
 

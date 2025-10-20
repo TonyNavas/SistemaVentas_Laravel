@@ -2,12 +2,13 @@
 
 namespace App\Livewire\Client;
 
-use App\Events\CreateOrder;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Table;
 use App\Models\Product;
 use Livewire\Component;
 use App\Models\Category;
+use App\Events\CreateOrder;
 use App\Models\OrderDetail;
 use Livewire\Attributes\On;
 use Livewire\WithPagination;
@@ -16,6 +17,8 @@ use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use App\Notifications\NewOrderNotification;
+use Illuminate\Support\Facades\Notification;
 
 #[Title('Cliente')]
 class MesaClientComponent extends Component
@@ -24,27 +27,36 @@ class MesaClientComponent extends Component
 
     // Propiedad para inicializar la mesa
     public Table $table;
-
+    public $client_name = '';
     public $mesaToken;
+
 
     public $category_id;
     public $search = '';
-    public $pagination = 10;
+    public $pagination = 5;
 
-public function mount($token)
-{
-    $this->table = Table::where('token', $token)->firstOrFail();
+    public function mount($token)
+    {
+        $this->table = Table::where('token', $token)->firstOrFail();
+        $this->client_name = $this->table->client_name ?? '';
+        $this->mesaToken = $token;
 
-    $this->mesaToken = $token;
+        // 🔥 Limpia el carrito al entrar a la mesa
+        Cart::instance($this->table->code)->destroy();
+    }
 
-    // 🔥 Limpia el carrito al entrar a la mesa
-    Cart::instance($this->table->code)->destroy();
-}
+
+    public function updatedClientName($value)
+    {
+        $this->table->client_name = $value;
+        $this->table->save();
+    }
 
 
     #[On('addProduct')]
-    public function addProduct(Product $product){
-                // Verificar si el producto ya está en el carrito
+    public function addProduct(Product $product)
+    {
+        // Verificar si el producto ya está en el carrito
         $existingItem = Cart::instance($this->table->code)->search(function ($cartItem, $rowId) use ($product) {
             return $cartItem->id == $product->id;
         })->first(); // Obtener el primer elemento de la colección
@@ -67,7 +79,7 @@ public function mount($token)
         }
     }
 
-        public function increment($id)
+    public function increment($id)
     {
         // Obtener el producto del carrito
         $item = Cart::instance($this->table->code)->search(function ($item, $rowId) use ($id) {
@@ -115,10 +127,16 @@ public function mount($token)
         $this->dispatch("devolverStock.{$id}", $qty);
     }
 
-        // Crear pedido
+    // Crear pedido
 
     public function createOrder()
     {
+
+        if (empty($this->table->client_name)) {
+            $this->dispatch('msg', 'Debe ingresar su nombre antes de realizar un pedido', 'warning');
+            return;
+        }
+
         $cart = Cart::instance($this->table->code)->content();
 
         if (count($cart) == 0) {
@@ -133,7 +151,7 @@ public function mount($token)
             // $order->pago = null; //Quitarlo y luego rellenarlo al hacer la venta
             $order->fecha = date('Y-m-d');
             $order->notas = '';
-            $order->user_id = Auth::user()->id;
+            $order->user_id = null;
             $order->table_id = $this->table->id;
             $order->save();
 
@@ -160,6 +178,13 @@ public function mount($token)
             $this->dispatch('msg', 'Pedido realizado correctamente', 'success');
 
             CreateOrder::dispatch($order, $this->table->token);
+
+            $users = User::role(['mesero', 'cocinero', 'administrador'])->get();
+
+
+            $url = route('kitchen.index');
+
+            Notification::send($users, new NewOrderNotification($order, $url));
         });
     }
 
@@ -177,7 +202,7 @@ public function mount($token)
         return $cartTotal;
     }
 
-        #[Computed()]
+    #[Computed()]
     public function orders()
     {
         return $this->table->orders()->whereIn('status', ['nuevo', 'en_proceso', 'listo', 'entregado'])->with('details.product')->get();
@@ -194,26 +219,38 @@ public function mount($token)
             ->sum('subtotal');
     }
 
-    #[On('echo-private:orders.{mesaToken},ChangeOrderStatus')]
+    #[On('echo:orders.{mesaToken},ChangeOrderStatus')]
     public function refreshOrders()
     {
         $this->dispatch('$refresh'); // 🔄 fuerza recalcular los #[Computed]
     }
 
+    public function updatingSearch()
+    {
+        $this->resetPage();
+    }
+
+    public function updatingCategoryId()
+    {
+        $this->resetPage();
+    }
+
+
     public function render()
     {
-        $query = Product::where('active', true); // ✅ solo productos activos
+        $query = Product::where('active', true);
 
-        // filtro por búsqueda
         if ($this->search) {
             $query->where('name', 'like', '%' . $this->search . '%');
         }
-        // filtro por categoría
+
         if ($this->category_id) {
             $query->where('category_id', $this->category_id);
         }
 
-        $products = $query->orderBy('id', 'desc')->paginate($this->pagination);
+        $products = $query->orderBy('id', 'desc')
+            ->paginate($this->pagination)
+            ->withQueryString(); // 👈 Mantiene los filtros al cambiar de página
 
         return view('livewire.client.mesa-client-component', [
             'products' => $products,

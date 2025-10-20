@@ -19,7 +19,7 @@
                                 <b>Productos</b> <a class="float-right">{{$category->products->count()}}</a>
                             </li>
                             <li class="list-group-item">
-                                <b>Articulos</b> <a class="float-right">{{$products->sum('stock')}}</a>
+                                <b>Cantidad de producto</b> <a class="float-right">{{$products->sum('stock')}}</a>
                             </li>
                         </ul>
                     </div>

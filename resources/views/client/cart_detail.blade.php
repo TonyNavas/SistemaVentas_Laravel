@@ -11,10 +11,21 @@
             <span class="badge bg-primary">{{ Cart::instance($this->table->code)->count() }}</span>
 
                         <!-- Boton realizar pedido -->
-            <button wire:click='createOrder' class="btn btn-primary ms-2">
-                <i class="fas fa-cart-plus"></i>
-                Realizar pedido
-            </button>
+<button
+    wire:click='createOrder'
+    wire:loading.attr="disabled"
+    class="btn btn-primary ms-2"
+>
+    <span wire:loading.remove>
+        <i class="fas fa-cart-plus"></i>
+        Realizar pedido
+    </span>
+    <span wire:loading>
+        <i class="fas fa-spinner fa-spin"></i>
+        Procesando...
+    </span>
+</button>
+
         </div>
     </div>
         <div class="card-body">

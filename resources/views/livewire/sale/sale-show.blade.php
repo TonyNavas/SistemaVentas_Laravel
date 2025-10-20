@@ -1,4 +1,5 @@
 <x-card title="Ver venta">
+
     <x-slot:cardTools>
 
         <a href="{{ route('sales.list') }}" class="btn btn-primary">
@@ -16,14 +17,15 @@
                         <!-- Here is a label for example -->
                         <i class="fas fa-tshirt" title="Numero productos"></i>
                         <span class="badge badge-pill badge-primary mr-2">
-                            {{ $sale->items->count() }}
+                            {{ $sale->orderDetails->count('product_id') }}
                         </span>
                         <i class="fas fa-shopping-basket" title="Numero items"></i>
                         <span class="badge badge-pill badge-primary mr-2">
-                            {{ $sale->items->sum('pivot.qty') }}
+                            {{ $sale->orderDetails->sum('quantity') }}
                         </span>
                         <i class="fas fa-clock" title="Fecha y hora de creacion"></i>
-                        {{ $sale->created_at }}
+                        {{ $sale->fecha }} -
+                        {{ $sale->created_at->diffForHumans() }}
                     </div>
                     <!-- /.card-tools -->
                 </div>
@@ -133,9 +135,11 @@
 
                                 <td>{{ $sale->user->email }}</td>
                                 <td>
-                                    <a href="{{ route('user.show', $sale->user) }}" class="btn btn-success btn-xs">
+                                    @can('ver-usuarios')
+                                        <a href="{{ route('user.show', $sale->user) }}" class="btn btn-success btn-xs">
                                         <i class="far fa-eye"></i>
                                     </a>
+                                    @endcan
                                 </td>
 
 

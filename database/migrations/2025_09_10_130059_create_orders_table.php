@@ -15,11 +15,12 @@ return new class extends Migration
             $table->id();
             $table->enum('status', ['nuevo', 'en_proceso', 'listo', 'entregado', 'pagado'])->default('nuevo');
             $table->decimal('total',10,2);
-            // $table->decimal('pago',10,2)->nullable();
+            $table->decimal('pago',10,2)->nullable();
             $table->date('fecha');
             $table->text('notas');
 
-            $table->foreignId('user_id')->constrained();
+            $table->foreignId('user_id')->nullable()->constrained()->nullOnDelete();
+
             $table->foreignId('table_id')->constrained();
             $table->foreignId('sale_id')->nullable()->constrained()->nullOnDelete();
 

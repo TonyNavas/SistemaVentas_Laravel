@@ -39,7 +39,8 @@
             <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu"
                 data-accordion="false">
 
-                <li class="nav-item">
+                @can('ver-inicio')
+                    <li class="nav-item">
                     <a href="{{ route('inicio') }}" class="{{ Request::is('/') ? 'active' : '' }} nav-link">
                         <i class="nav-icon fas fa-home"></i>
                         <p>
@@ -47,6 +48,7 @@
                         </p>
                     </a>
                 </li>
+                @endcan
 
                 {{-- <li class="nav-item">
                     <a href="#" class="nav-link">
@@ -80,7 +82,7 @@
 
                 <li class="nav-header">GENERAL</li>
 
-                @can('read-sales')
+                @can('ver-ventas')
                     <li class="nav-item">
                         <a href="{{ route('sales.list') }}" class="nav-link {{ Request::is('ventas') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-shopping-cart"></i>
@@ -89,7 +91,7 @@
                     </li>
                 @endcan
 
-                @can('read-categories')
+                @can('ver-categorias')
                     <li class="nav-item">
                         <a href="{{ route('category.index') }}"
                             class="nav-link {{ Request::is('categorias') ? 'active' : '' }}">
@@ -99,7 +101,7 @@
                     </li>
                 @endcan
 
-                @can('read-products')
+                @can('ver-productos')
                     <li class="nav-item">
                         <a href="{{ route('product.index') }}"
                             class="nav-link {{ Request::is('productos') ? 'active' : '' }}">
@@ -109,7 +111,7 @@
                     </li>
                 @endcan
 
-                @can('read-cabin')
+                @can('ver-mesa')
                     <li class="nav-item">
                         <a href="{{ route('tables.index') }}" class="nav-link {{ Request::is('mesas') ? 'active' : '' }}">
                             <i class="nav-icon fas fa-concierge-bell"></i>
@@ -118,7 +120,7 @@
                     </li>
                 @endcan
 
-                @can('read-kitchen')
+                @can('ver-cocina')
                     <li class="nav-item">
                         <a href="{{ route('kitchen.index') }}"
                             class="nav-link {{ Request::is('cocina') ? 'active' : '' }}">
@@ -128,9 +130,21 @@
                     </li>
                 @endcan
 
+                @can('ver-ordenes')
+                    <li class="nav-item">
+                    <a href="{{ route('ordersready.list') }}" class="{{ Request::is('ordenes-listas') ? 'active' : '' }} nav-link">
+                        <i class="nav-icon fas fa-check"></i>
+
+                        <p>
+                            Ordenes listas
+                        </p>
+                    </a>
+                </li>
+                @endcan
+
                 <li class="nav-header">CONFIGURACIÓN</li>
 
-                @can('read-users')
+                @can('ver-usuarios')
                     <li class="nav-item">
                         <a href="{{ route('user.index') }}"
                             class="nav-link {{ Request::is('usuarios') ? 'active' : '' }}">
@@ -140,7 +154,7 @@
                     </li>
                 @endcan
 
-                @can('read-roles')
+                @can('ver-roles')
                     <li class="nav-item">
                         <a href="{{ route('admin.roles.index') }}"
                             class="nav-link {{ Request::is('roles') ? 'active' : '' }}">

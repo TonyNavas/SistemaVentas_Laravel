@@ -19,7 +19,6 @@ return new class extends Migration
             $table->integer('quantity')->unsigned();
             $table->date('fecha');
             $table->decimal('subtotal',10,2)->unsigned();
-
             $table->enum('status', ['nuevo', 'en_proceso', 'listo', 'cancelado', 'entregado'])->default('nuevo');
 
             $table->foreignId('order_id')->constrained()->onDelete('cascade');

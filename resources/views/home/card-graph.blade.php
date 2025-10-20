@@ -64,7 +64,7 @@
             responsive: true,
             tooltips: {
                 callbacks: {
-                    label: (item) => `Ventas $${item.yLabel}`,
+                    label: (item) => `Ventas C$ ${item.yLabel}`,
                 },
             },
             legend: {

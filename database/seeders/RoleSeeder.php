@@ -3,89 +3,85 @@
 namespace Database\Seeders;
 
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Spatie\Permission\Models\Permission;
 use Spatie\Permission\Models\Role;
 
 class RoleSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
-        $permissions = [
-            // Categorias
-            'create-categories',
-            'read-categories',
-            'update-categories',
-            'delete-categories',
-
-            // Productos
-            'create-products',
-            'read-products',
-            'update-products',
-            'delete-products',
+        // -------------------
+        // 1️⃣ Permisos de Administrador
+        // -------------------
+        $adminPermissions = [
+            // Inicio
+            'ver-inicio', 'ver-ventasHoyReport', 'ver-grafico-mes', 'ver-boxes-reporte', 'ver-tablas-reporte',
 
             // Ventas
-            'create-sales',
-            'read-sales',
-            'update-sales',
-            'delete-sales',
+            'crear-ventas', 'ver-ventas', 'modificar-ventas', 'eliminar-ventas', 'registrar-pago',
+
+            // Categorías
+            'crear-categorias', 'ver-categorias', 'modificar-categorias', 'eliminar-categorias',
+
+            // Productos
+            'crear-productos', 'ver-productos', 'modificar-productos', 'eliminar-productos', 'buscar-productos',
 
             // Cabañas/Mesas
-            'create-cabin',
-            'read-cabin',
-            'open-cabin',
-            'close-cabin',
-            'delete-cabin',
+            'crear-mesa', 'ver-mesa', 'abrir-mesa', 'cerrar-mesa', 'eliminar-mesa',
 
             // Cocina
-            'read-kitchen',
-            'read-orders',
-            'change-order-status',
-            'change-product-status',
-
-            // Reports
-
-            'read-ventasHoyReport',
-            'read-month-graph',
-            'read-boxes-report',
-            'read-tables-report',
+            'ver-cocina', 'ver-ordenes', 'cambiar-estado-orden', 'cambiar-estado-productos', 'cambiar-estado-orden-lista',
 
             // Factura
-            'print-invoice',
+            'imprimir-ticket',
 
             // Usuarios
-            'create-users',
-            'read-users',
-            'update-users',
-            'delete-users',
+            'crear-usuarios', 'ver-usuarios', 'modificar-usuarios', 'eliminar-usuarios',
 
             // Roles
-            'create-roles',
-            'read-roles',
-            'update-roles',
-            'delete-roles',
-
-            // Permissions
-            'create-permissions',
-            'read-permissions',
-            'update-permissions',
-            'delete-permissions',
+            'crear-roles', 'ver-roles', 'modificar-roles', 'eliminar-roles',
         ];
 
-        foreach($permissions as $permission){
-            Permission::create(['name' => $permission]);
+        // Crear permisos si no existen
+        foreach ($adminPermissions as $permission) {
+            Permission::firstOrCreate(['name' => $permission]);
         }
 
-        Role::create(['name' => 'superadmin'])->givePermissionTo(Permission::all());
+        // Crear rol administrador y asignar todos los permisos
+        $adminRole = Role::firstOrCreate(['name' => 'administrador']);
+        $adminRole->givePermissionTo($adminPermissions);
 
+        // -------------------
+        // Permisos de Mesero
+        // -------------------
+        $meseroPermissions = [
+            'ver-mesa', 'abrir-mesa', 'cerrar-mesa',
+            'ver-ordenes', 'ver-cocina',
+            'crear-ventas', 'ver-ventas', 'imprimir-ticket',
+            'cambiar-estado-orden-lista'
+        ];
+
+        $meseroRole = Role::firstOrCreate(['name' => 'mesero']);
+        $meseroRole->givePermissionTo($meseroPermissions);
+
+        // -------------------
+        // Permisos de Cocinero
+        // -------------------
+        $cocineroPermissions = [
+            'ver-cocina', 'ver-ordenes', 'cambiar-estado-orden', 'cambiar-estado-productos',
+        ];
+
+        $cocineroRole = Role::firstOrCreate(['name' => 'cocinero']);
+        $cocineroRole->givePermissionTo($cocineroPermissions);
+
+        // -------------------
+        // Usuario administrador inicial
+        // -------------------
         User::factory()->create([
             'name' => 'Administrador',
-            'email' => 'useradmin@gmail.com',
+            'email' => 'admin@elcortez.com',
             'password' => bcrypt('password'),
-        ])->assignRole('superadmin');
+        ])->assignRole('administrador');
     }
 }

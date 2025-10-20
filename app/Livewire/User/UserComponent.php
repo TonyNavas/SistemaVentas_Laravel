@@ -9,9 +9,10 @@ use Livewire\WithPagination;
 use Livewire\WithFileUploads;
 use Livewire\Attributes\Title;
 use Spatie\Permission\Models\Role;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 
-#[Title('Usuarios')]
+#[Title('El cortez | Usuarios')]
 class UserComponent extends Component
 {
     use WithFileUploads;
@@ -47,6 +48,7 @@ class UserComponent extends Component
 
     public function create()
     {
+        Gate::authorize('crear-usuarios');
         $this->Id = 0;
         $this->resetUI();
         $this->resetValidation();
@@ -56,6 +58,7 @@ class UserComponent extends Component
     // Crear Usuario
     public function store()
     {
+        Gate::authorize('crear-usuarios');
         $this->validate([
             'name' => 'required|min:5|max:255',
             'email' => 'required|email|max:255|unique:users',
@@ -87,7 +90,7 @@ class UserComponent extends Component
 
     public function edit(User $user)
     {
-
+    Gate::authorize('modificar-usuarios');
         $this->resetUI();
 
         $this->Id = $user->id;
@@ -103,13 +106,14 @@ class UserComponent extends Component
 
     public function update(User $user)
     {
+        Gate::authorize('modificar-usuarios');
         $this->validate([
             'name' => 'required|min:5|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $this->Id,
             'password' => 'nullable|min:5',
             're_password' => 'same:password',
             'image' => 'image|max:1024|nullable',
-            'role' => 'required|string', // ⚡ que el rol sea obligatorio
+            'role' => 'required|string', // que el rol sea obligatorio
         ]);
 
         $user->name = $this->name;
@@ -149,19 +153,20 @@ class UserComponent extends Component
     #[On('destroyUser')]
     public function destroy($id)
     {
+        Gate::authorize('eliminar-usuarios');
         $user = User::findOrFail($id);
 
-        // 🔹 Primero limpiar roles y permisos
+        // Limpiar roles y permisos
         $user->roles()->detach();
         $user->permissions()->detach();
 
-        // 🔹 Luego manejar la imagen
+        // Menejo de la imagen
         if ($user->image != null) {
             Storage::delete('public/' . $user->image->url);
             $user->image()->delete();
         }
 
-        // 🔹 Finalmente eliminar usuario
+        // Eliminar usuario
         $user->delete();
 
         $this->usersCount();
@@ -178,6 +183,7 @@ class UserComponent extends Component
 
     public function render()
     {
+        Gate::authorize('ver-usuarios');
         $users = User::where('name', 'LIKE', '%' . $this->search . '%')
             ->orderBy('id', 'desc')
             ->paginate($this->pagination);

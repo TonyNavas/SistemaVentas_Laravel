@@ -36,7 +36,7 @@ class ChangeOrderStatus implements ShouldBroadcast
     public function broadcastOn(): array
     {
         return [
-            new PrivateChannel('orders.' . $this->mesaToken)
+            new Channel('orders.' . $this->mesaToken)
         ];
     }
 }

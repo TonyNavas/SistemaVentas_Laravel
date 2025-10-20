@@ -39,7 +39,7 @@
             <span class="info-box-icon bg-primary elevation-1"><i class="fas fa-shopping-basket"></i></span>
 
             <div class="info-box-content">
-                <span class="info-box-text">Articulos Vendidos</span>
+                <span class="info-box-text">Total de productos Vendidos</span>
                 <span class="info-box-number">
                     {{$cantidadArticulos}}
                 </span>

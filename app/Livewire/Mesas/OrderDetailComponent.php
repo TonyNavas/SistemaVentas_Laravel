@@ -3,8 +3,9 @@
 namespace App\Livewire\Mesas;
 
 use App\Models\Order;
-use App\Models\OrderDetail;
 use Livewire\Component;
+use App\Models\OrderDetail;
+use Illuminate\Support\Facades\Gate;
 
 class OrderDetailComponent extends Component
 {

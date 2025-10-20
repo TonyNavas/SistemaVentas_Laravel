@@ -35,7 +35,8 @@
                                     {!! QrCode::size(200)->generate(route('mesa.cliente', $table->token)) !!}
 
                                     <p class="mt-3">
-                                        <a class="nav-link" href="{{ route('mesa.cliente', $table->token) }}">{{ route('mesa.cliente', $table->token) }}</a>
+                                        <a class="nav-link"
+                                            href="{{ route('mesa.cliente', $table->token) }}">{{ route('mesa.cliente', $table->token) }}</a>
                                     </p>
                                 </div>
                             @else
@@ -43,7 +44,7 @@
                                     Esta mesa está <strong>cerrada</strong> y no tiene QR asignado.
                                 </div>
                             @endif
-                                {{-- End QR --}}
+                            {{-- End QR --}}
                             <p class="card-text">
                                 <span class="badge bg-info">
                                     {{ $table->status == 'closed' ? 'DISPONIBLE' : 'OCUPADA' }}
@@ -51,16 +52,23 @@
                             </p>
                             <div class="d-flex justify-content-between">
                                 @if ($table->status == 'closed')
-                                    <a class="btn btn-success w-100" wire:click="openTable({{ $table->id }})">Abrir
-                                        Mesa</a>
+                                    @can('abrir-mesa')
+                                        <a class="btn btn-success w-100" wire:click="openTable({{ $table->id }})">Abrir
+                                        Mesa
+                                    </a>
+                                    @endcan
                                 @else
-                                    <a class="btn btn-info w-100" wire:click="goToTable({{ $table->id }})">Entrar</a>
+                                    @can('ver-mesa')
+                                        <a class="btn btn-info w-100" wire:click="goToTable({{ $table->id }})">Entrar</a>
+                                    @endcan
                                 @endif
 
-                                <a wire:click="$dispatch('delete', {id : {{ $table->id }}, eventName: 'deleteTable'})"
+                                @can('eliminar-mesa')
+                                    <a wire:click="$dispatch('delete', {id : {{ $table->id }}, eventName: 'deleteTable'})"
                                     class="btn btn-danger ml-2 float-right">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
+                                @endcan
                             </div>
                         </div>
                     </div>

@@ -1,10 +1,21 @@
 <div class="container-fluid">
+    <div class="input-group mb-3">
+        <div class="input-group-prepend">
+            <span class="input-group-text" id="basic-addon1">
+                <i class="fas fa-user"></i>
+            </span>
+        </div>
+        <input wire:model.live='client_name' type="text" class="form-control" placeholder="Ingresa el nombre del cliente" aria-label="ClientName">
+    </div>
 
     <x-card cardTitle="{{ $table->code }}" cardTitleSize="display-1">
         <x-slot:cardTools>
-            <a class="btn btn-danger mr-2" wire:click="closeTable({{ $table->id }})">
+            @can('cerrar-mesa')
+                <a class="btn btn-danger mr-2" wire:click="closeTable({{ $table->id }})">
                 <span><i class="fas fa-ban"></i> Cerrar mesa</span>
             </a>
+            @endcan
+
             <a href="{{ route('tables.index') }}" class="btn btn-primary">
                 <span><i class="fas fa-chevron-left"></i> Regresar a mesas</span>
             </a>
@@ -37,19 +48,19 @@
 </div>
 
 @section('js')
-<script>
-    document.addEventListener("DOMContentLoaded", () => {
-        let mesaToken = @js($table->token);
+    <script>
+        document.addEventListener("DOMContentLoaded", () => {
+            let mesaToken = @js($table->token);
 
-        Echo.private('orders.' + mesaToken)
-            .listen('CreateOrder', (e) => {
-                console.log("Nueva orden recibida en esta mesa:", e);
+            Echo.private('orders.' + mesaToken)
+                .listen('CreateOrder', (e) => {
+                    console.log("Nueva orden enviada de esta mesa:", e);
 
-            })
-            .listen('ChangeOrderStatus', (e) => {
-                console.log("Estado del pedido actualizado:", e);
+                })
+                .listen('ChangeOrderStatus', (e) => {
+                    console.log("Estado del pedido actualizado:", e);
 
-                        Swal.fire({
+                    Swal.fire({
                         position: "center",
                         title: "Actualizacion de pedido",
                         icon: "info",
@@ -57,8 +68,7 @@
                         showConfirmButton: false,
                         timer: 2000
                     });
-            });
-    });
-</script>
+                });
+        });
+    </script>
 @endsection
-

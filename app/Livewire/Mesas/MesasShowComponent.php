@@ -2,8 +2,10 @@
 
 namespace App\Livewire\Mesas;
 
+use Log;
 use App\Models\Item;
 use App\Models\Sale;
+use App\Models\User;
 use App\Models\Order;
 use App\Models\Table;
 use App\Models\Product;
@@ -17,7 +19,10 @@ use App\Models\NumerosEnLetras;
 use Livewire\Attributes\Computed;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Gloudemans\Shoppingcart\Facades\Cart;
+use App\Notifications\NewOrderNotification;
+use Illuminate\Support\Facades\Notification;
 
 #[Title('Detalle de cabaña')]
 class MesasShowComponent extends Component
@@ -26,6 +31,7 @@ class MesasShowComponent extends Component
 
     public Table $table;
     public $mesaToken;
+    public $client_name = '';
 
     // Propiedades clase
     public $search = '';
@@ -42,8 +48,14 @@ class MesasShowComponent extends Component
 
     public function mount()
     {
+        $this->client_name = $this->table->client_name ?? '';
         $this->mesaToken = $this->table->token;
-        $this->recuperarCarrito();
+    }
+
+    public function updatedClientName($value)
+    {
+        $this->table->client_name = $value;
+        $this->table->save();
     }
 
     public function getTotalArticles()
@@ -78,44 +90,8 @@ class MesasShowComponent extends Component
                 ]
             ]);
         }
-
-        // $this->mantenerCarrito();
     }
 
-    public function mantenerCarrito()
-    {
-        // Eliminar productos anteriores asociados a la mesa
-        $this->table->products()->detach();
-
-        // Agregar los productos actuales del carrito asociados a la mesa
-        $cartContent = Cart::instance($this->table->code)->content();
-
-        foreach ($cartContent as $item) {
-            $this->table->products()->attach($item->id, ['quantity' => $item->qty]);
-        }
-    }
-
-    public function recuperarCarrito()
-    {
-        // Limpiar el carrito antes de recuperar los productos de la mesa
-        Cart::instance($this->table->code)->destroy();
-
-        // Recuperar los productos asociados a la mesa y agregarlos al carrito
-        $mesaProducts = $this->table->products;
-
-        foreach ($mesaProducts as $product) {
-            Cart::instance($this->table->code)->add([
-                'id' => $product->id,
-                'name' => $product->name,
-                'price' => $product->precio_venta,
-                'qty' => $product->pivot->quantity,
-                'weight' => 1,
-                'options' => [
-                    'image' => $product,
-                ]
-            ]);
-        }
-    }
 
     public function increment($id)
     {
@@ -129,9 +105,6 @@ class MesasShowComponent extends Component
         if ($item) {
             // Incrementar la cantidad en el carrito
             Cart::instance($this->table->code)->update($item->rowId, $item->qty + 1);
-
-            // Incrementar la cantidad en la base de datos
-            // $this->table->products()->updateExistingPivot($item->id, ['quantity' => $item->qty + 1]);
         }
 
         $this->dispatch("decrementStock.{$id}");
@@ -148,13 +121,9 @@ class MesasShowComponent extends Component
         if ($item && $item->qty > 1) {
             // Decrementar la cantidad en el carrito
             Cart::instance($this->table->code)->update($item->rowId, $item->qty - 1);
-
-            // Decrementar la cantidad en la base de datos
-            $this->table->products()->updateExistingPivot($item->id, ['quantity' => $item->qty - 1]);
         } else {
             // Si la cantidad es 1 o menos, eliminar el producto del carrito y de la base de datos
             Cart::instance($this->table->code)->remove($item->rowId);
-            $this->table->products()->detach($item->id);
         }
 
         $this->dispatch("incrementStock.{$id}");
@@ -170,7 +139,6 @@ class MesasShowComponent extends Component
 
         if ($item) {
             Cart::instance($this->table->code)->remove($item->rowId);
-            $this->table->products()->detach($item->id);
         }
 
         $this->dispatch("devolverStock.{$id}", $qty);
@@ -188,6 +156,11 @@ class MesasShowComponent extends Component
 
     public function createOrder()
     {
+        if (empty($this->table->client_name)) {
+            $this->dispatch('msg', 'Debe ingresar su nombre antes de realizar un pedido', 'warning');
+            return;
+        }
+
         $cart = Cart::instance($this->table->code)->content();
 
         if (count($cart) == 0) {
@@ -230,6 +203,14 @@ class MesasShowComponent extends Component
             $this->dispatch('msg', 'Pedido realizado correctamente', 'success');
 
             CreateOrder::dispatch($order, $this->table->token);
+
+            $users = User::role(['mesero', 'cocinero', 'administrador'])
+                ->where('id', '!=', Auth::user()->id)
+                ->get();
+
+            $url = route('kitchen.index');
+
+            Notification::send($users, new NewOrderNotification($order, $url));
         });
     }
 
@@ -266,14 +247,16 @@ class MesasShowComponent extends Component
                 $order->save();
             }
 
-            // // Cerrar la mesa
-            // $this->table->status = 'closed';
-            // $this->table->save();
-
             $this->reset(['pago', 'cambio']);
             $this->dispatch('msg', 'Venta registrada correctamente', 'success', $sale->id);
+
+            // Cerrar la mesa
+            $this->closeTable($this->table);
+            redirect()->route('sales.list');
         });
     }
+
+
 
     public function limpiarMesa(Table $table)
     {
@@ -283,12 +266,19 @@ class MesasShowComponent extends Component
 
     public function closeTable(Table $table)
     {
-        // Eliminar todos los productos del carrito
+        Gate::authorize('cerrar-mesa');
+
+        // Si no hay venta asociada, no permitir cerrar
+        if ($table->orders()->whereNull('sale_id')->exists()) {
+            $this->dispatch('msg', 'No puedes cerrar la mesa sin registrar el pago.', 'danger');
+            return;
+        }
+
+        // Vaciar el carrito
         Cart::instance($table->code)->destroy();
 
-        // Eliminar los productos asociados a la mesa en la base de datos
-        $table->products()->detach();
-
+        // Limpiar y cerrar mesa
+        $table->client_name = null;
         // Cambiar el estado de la mesa a "closed"
         $table->status = 'closed';
         $table->token = null;
@@ -296,6 +286,7 @@ class MesasShowComponent extends Component
 
         return redirect()->route('tables.index');
     }
+
 
     #[Computed()]
     public function products()
@@ -324,7 +315,6 @@ class MesasShowComponent extends Component
     #[Computed()]
     public function orders()
     {
-        // return $this->table->orders()->with('details.product')->get();
         return $this->table->orders()->whereIn('status', ['nuevo', 'en_proceso', 'listo', 'entregado'])->with('details.product')->get();
     }
 
@@ -350,12 +340,13 @@ class MesasShowComponent extends Component
     #[On('echo-private:orders.{mesaToken},ChangeOrderStatus')]
     public function refreshOrders()
     {
-        $this->dispatch('$refresh'); // 🔄 fuerza recalcular los #[Computed]
+        $this->dispatch('$refresh'); // fuerza recalcular los #[Computed]
     }
 
 
     public function render()
     {
+        Gate::authorize('ver-mesa');
         if ($this->search != '') {
             $this->resetPage();
         }
